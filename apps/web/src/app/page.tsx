@@ -29,11 +29,22 @@ import { DomoMascot } from '@/components/mascot/DomoMascot';
 import { AgentBeltCarousel } from '@/components/brands/AgentBeltCarousel';
 
 const CYCLING_WORDS = ['Frontend & React', 'OWASP Security', 'AI & RAG Agents', 'Cloud & Edge', 'DevOps & K8s', 'Clean Architecture'];
+const TYPEWRITER_PHRASES = [
+  '100% Free and Opensource',
+  'Universal Agent Capabilities',
+  '100% Free and Opensource',
+  'Zero Paywalls • Zero Credits',
+];
 
 export default function HomePage() {
   const router = useRouter();
   const [wordIndex, setWordIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Typewriter loop state (~5s cycle)
+  const [typewriterText, setTypewriterText] = useState('');
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Cycle hero keywords smoothly
   useEffect(() => {
@@ -42,6 +53,30 @@ export default function HomePage() {
     }, 2400);
     return () => clearInterval(interval);
   }, []);
+
+  // 5-second Typewriter Loop
+  useEffect(() => {
+    const currentPhrase = TYPEWRITER_PHRASES[phraseIdx];
+    let timer: NodeJS.Timeout;
+
+    if (!isDeleting && typewriterText === currentPhrase) {
+      timer = setTimeout(() => setIsDeleting(true), 3200); // Hold full text
+    } else if (isDeleting && typewriterText === '') {
+      setIsDeleting(false);
+      setPhraseIdx((prev) => (prev + 1) % TYPEWRITER_PHRASES.length);
+    } else {
+      const speed = isDeleting ? 30 : 55;
+      timer = setTimeout(() => {
+        setTypewriterText((prev) =>
+          isDeleting
+            ? currentPhrase.substring(0, prev.length - 1)
+            : currentPhrase.substring(0, prev.length + 1)
+        );
+      }, speed);
+    }
+
+    return () => clearTimeout(timer);
+  }, [typewriterText, isDeleting, phraseIdx]);
 
   const categories = registry.getCategories();
   const trendingSkills = registry.getTrendingSkills(6);
@@ -70,16 +105,17 @@ export default function HomePage() {
             {/* Left Hero Column */}
             <div className="lg:col-span-7 space-y-7">
               
-              {/* Top Branding Pill */}
+              {/* Top Branding Pill with Animated 5s Typewriter Loop */}
               <div className="inline-flex items-center gap-2.5 rounded-full border border-border bg-surface px-4 py-1.5 font-mono text-xs text-text-secondary shadow-sm">
                 <img
                   src="/assets/domodomo/domodomo-app-icon.png"
                   alt="Domo Mascot"
                   className="h-4 w-4 rounded-full object-cover"
                 />
-                <span className="text-white font-bold">DomoSkills Marketplace</span>
-                <span className="text-text-muted">/</span>
-                <span className="text-emerald-400 font-semibold">100% Free & Open Source</span>
+                <span className="text-emerald-400 font-bold tracking-wide flex items-center min-w-[210px]">
+                  <span>{typewriterText}</span>
+                  <span className="inline-block w-1.5 h-3 bg-emerald-400 animate-pulse ml-1" />
+                </span>
               </div>
 
               {/* Main Editorial Headline with Shimmer Animation */}
