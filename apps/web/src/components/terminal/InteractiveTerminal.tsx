@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Copy, Check, Terminal as TerminalIcon, Sparkles, MessageSquare } from 'lucide-react';
+import { Copy, Check, Terminal as TerminalIcon, Sparkles } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 
 interface TerminalProps {
@@ -16,6 +16,12 @@ export function InteractiveTerminal({
   const [copied, setCopied] = useState(false);
   const [inputVal, setInputVal] = useState('');
   const [domoQuote, setDomoQuote] = useState('Domo ready to run skills!');
+  const [showQuote, setShowQuote] = useState(true);
+  
+  // 3D Physics Tilt State
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ rotX: 0, rotY: 0, glareX: 50, glareY: 50, isHovered: false });
+
   const [history, setHistory] = useState<Array<{ command: string; output: string[] }>>([
     {
       command: 'npx domoskills add react-performance owasp-agent-guardian',
@@ -44,15 +50,40 @@ export function InteractiveTerminal({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // 3D Tilt Physics Calculations
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotX = -((y - centerY) / centerY) * 7.5; // Max 7.5deg tilt
+    const rotY = ((x - centerX) / centerX) * 7.5;
+
+    const glareX = (x / rect.width) * 100;
+    const glareY = (y / rect.height) * 100;
+
+    setTilt({ rotX, rotY, glareX, glareY, isHovered: true });
+  };
+
+  const handlePointerLeave = () => {
+    setTilt({ rotX: 0, rotY: 0, glareX: 50, glareY: 50, isHovered: false });
+  };
+
   const handleDomoClick = () => {
     const quotes = [
-      'Type "help" to see CLI commands!',
-      'Type "doctor" to run diagnostic checks!',
-      'Type "search react" for UI capabilities!',
+      'Type "help" to see all commands!',
+      'Type "doctor" for diagnostics!',
+      'Type "search react" for UI tools!',
       'Type "audit" for AST security analysis!',
+      'Type "add drizzle-orm-master" to install!',
     ];
     const nextQuote = quotes[Math.floor(Math.random() * quotes.length)];
     setDomoQuote(nextQuote);
+    setShowQuote(true);
     setActiveTab('cli');
     setInputVal('doctor');
   };
@@ -146,10 +177,29 @@ export function InteractiveTerminal({
   }, [history, activeTab]);
 
   return (
-    <div className="relative w-full rounded-2xl border border-border bg-surface-raised shadow-2xl overflow-hidden font-mono text-xs card-polkadot-hover">
+    <div
+      ref={containerRef}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+      style={{
+        transform: `perspective(1100px) rotateX(${tilt.rotX}deg) rotateY(${tilt.rotY}deg) scale3d(${tilt.isHovered ? 1.015 : 1}, ${tilt.isHovered ? 1.015 : 1}, 1)`,
+        transition: tilt.isHovered ? 'transform 0.1s ease-out' : 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+      }}
+      className="relative w-full rounded-2xl border border-border bg-surface-raised shadow-2xl overflow-visible font-mono text-xs card-polkadot-hover"
+    >
       
+      {/* Dynamic 3D Glare Lighting Sheen */}
+      {tilt.isHovered && (
+        <div
+          className="pointer-events-none absolute inset-0 z-20 rounded-2xl opacity-40 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(400px circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(255, 255, 255, 0.08), transparent 60%)`,
+          }}
+        />
+      )}
+
       {/* Terminal Window Header */}
-      <div className="flex items-center justify-between border-b border-border bg-surface px-4 py-3">
+      <div className="flex items-center justify-between border-b border-border bg-surface px-4 py-3 rounded-t-2xl">
         <div className="flex items-center gap-2">
           <div className="flex gap-1.5">
             <span className="h-3 w-3 rounded-full bg-border-bright/60 hover:bg-red-500/80 transition cursor-pointer"></span>
@@ -199,7 +249,7 @@ export function InteractiveTerminal({
       </div>
 
       {/* Terminal Screen Body */}
-      <div className="p-4 sm:p-6 bg-background/95 min-h-[280px] max-h-[360px] overflow-y-auto space-y-4 pb-16">
+      <div className="p-4 sm:p-6 bg-background/95 min-h-[280px] max-h-[360px] overflow-y-auto space-y-4 rounded-b-2xl pb-16">
         
         {activeTab === 'demo' ? (
           <div>
@@ -267,34 +317,34 @@ export function InteractiveTerminal({
 
       </div>
 
-      {/* Mascot Station on Bottom-Left of the Terminal Card */}
-      <div className="absolute bottom-3 left-3 z-30 flex items-center gap-3">
+      {/* DomoDomo Signature Frameless Mascot Overlay on Bottom-Right Corner */}
+      <div className="absolute -bottom-6 -right-5 sm:-bottom-8 sm:-right-6 z-40 flex items-end pointer-events-auto select-none">
         
-        {/* Animated Domo Mascot Avatar */}
+        {/* Floating Speech Bubble */}
+        {showQuote && (
+          <div
+            onClick={handleDomoClick}
+            className="mb-14 mr-[-10px] cursor-pointer rounded-xl border border-white/20 bg-surface/95 px-3 py-1.5 font-mono text-[11px] text-white shadow-xl backdrop-blur-md transition hover:scale-105 hover:border-white animate-bounce-subtle flex items-center gap-1.5"
+            style={{ animationDuration: '3s' }}
+          >
+            <span className="text-emerald-400 font-bold">Domo:</span>
+            <span>{domoQuote}</span>
+          </div>
+        )}
+
+        {/* Frameless Animated Domo Mascot sitting on bottom-right */}
         <button
           type="button"
           onClick={handleDomoClick}
-          className="group relative flex h-14 w-14 items-center justify-center rounded-xl border border-white/30 bg-surface-raised/95 p-1 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:border-white"
-          title="Click Domo to run a test CLI command!"
+          className="group relative cursor-pointer p-0 bg-transparent border-0 outline-none transition-transform duration-300 hover:scale-110 active:scale-95 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
+          title="Click Domo to run an automated diagnostic command!"
         >
           <img
             src="/assets/domodomo/domolaptop.gif"
-            alt="Domo Terminal Assistant"
-            className="h-full w-full object-contain"
+            alt="Domo Terminal Mascot"
+            className="h-28 w-28 sm:h-32 sm:w-32 object-contain"
           />
-          <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 text-[8px] font-bold text-black ring-2 ring-background">
-            ✓
-          </span>
         </button>
-
-        {/* Mascot Speech / Tip Bubble */}
-        <div
-          onClick={handleDomoClick}
-          className="cursor-pointer rounded-lg border border-border bg-surface/95 px-3 py-1.5 font-mono text-[11px] text-white shadow-md backdrop-blur-md transition hover:border-white/60 flex items-center gap-2"
-        >
-          <span className="text-emerald-400 font-bold">Domo:</span>
-          <span>{domoQuote}</span>
-        </div>
 
       </div>
 

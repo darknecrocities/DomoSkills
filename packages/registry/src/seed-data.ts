@@ -1739,5 +1739,507 @@ version: 1.1.0
     createdAt: '2025-07-20T00:00:00.000Z',
     updatedAt: '2026-08-26T00:00:00.000Z',
   },
+
+  // 32. AI/ML - Vercel AI SDK Core Mastery
+  {
+    id: 'skill-vercel-ai-sdk-mastery',
+    slug: 'vercel-ai-sdk-mastery',
+    name: 'Vercel AI SDK Core & Generative UI',
+    description: 'Streaming text, multi-modal tool calling, object generation with Zod, and Generative UI components using the Vercel AI SDK.',
+    category: 'ai-ml',
+    tags: ['AI-SDK', 'Streaming', 'Generative-UI', 'Zod', 'Tool-Calling', 'Next.js'],
+    sourceRepository: SEED_REPOSITORIES['domoskills-official'],
+    sourcePath: 'skills/vercel-ai-sdk-mastery',
+    sourceUrl: 'https://github.com/vercel/ai',
+    license: 'Apache-2.0',
+    version: '3.4.0',
+    commitSha: '9a1e44f',
+    compatibility: ['universal', 'claude', 'codex', 'cursor', 'opencode', 'copilot', 'gemini'],
+    trustLevel: 'Official',
+    installs: 48900,
+    favorites: 9320,
+    isVerified: true,
+    isFeatured: true,
+    security: {
+      isMetadataValid: true,
+      isLicenseDetected: true,
+      isSourceVerified: true,
+      containsScripts: false,
+      requiresEnvironmentVariables: false,
+      requiresExternalDependencies: false,
+      executableFiles: [],
+      securityScore: 100,
+      warnings: [],
+    },
+    files: [{ path: 'SKILL.md', type: 'file', size: 3400, isExecutable: false }],
+    instructions: `---
+name: vercel-ai-sdk-mastery
+description: Streaming text, multi-modal tool calling, object generation with Zod, and Generative UI components using the Vercel AI SDK.
+license: Apache-2.0
+version: 3.4.0
+---
+
+# Vercel AI SDK Guidelines
+
+1. Use \`streamText\` with \`toDataStreamResponse()\` for standard LLM streams.
+2. Define typed tool schemas with Zod and handle execution promises cleanly.
+3. Use \`generateObject\` for structured JSON outputs with schema enforcement.
+4. Render streamed UI with \`useChat\` and \`useCompletion\` hooks.
+`,
+    lastIndexedAt: '2026-08-31T12:00:00.000Z',
+    createdAt: '2025-08-01T00:00:00.000Z',
+    updatedAt: '2026-08-30T00:00:00.000Z',
+  },
+
+  // 33. AI/ML - Model Context Protocol (MCP) Bridge
+  {
+    id: 'skill-mcp-model-context-protocol',
+    slug: 'mcp-model-context-protocol',
+    name: 'Model Context Protocol (MCP) Server Bridge',
+    description: 'Implement standardized Model Context Protocol (MCP) tool servers, resources, prompts, and JSON-RPC transport bridges.',
+    category: 'ai-ml',
+    tags: ['MCP', 'Anthropic', 'JSON-RPC', 'Protocol', 'Tool-Use', 'Standards'],
+    sourceRepository: SEED_REPOSITORIES['anthropic-community'],
+    sourcePath: 'skills/mcp-model-context-protocol',
+    sourceUrl: 'https://github.com/modelcontextprotocol/servers',
+    license: 'MIT',
+    version: '1.2.0',
+    commitSha: '6c8f12d',
+    compatibility: ['universal', 'claude', 'codex', 'cursor', 'opencode', 'gemini'],
+    trustLevel: 'Verified',
+    installs: 36400,
+    favorites: 7120,
+    isVerified: true,
+    isFeatured: true,
+    security: {
+      isMetadataValid: true,
+      isLicenseDetected: true,
+      isSourceVerified: true,
+      containsScripts: false,
+      requiresEnvironmentVariables: false,
+      requiresExternalDependencies: false,
+      executableFiles: [],
+      securityScore: 100,
+      warnings: [],
+    },
+    files: [{ path: 'SKILL.md', type: 'file', size: 3100, isExecutable: false }],
+    instructions: `---
+name: mcp-model-context-protocol
+description: Implement standardized Model Context Protocol (MCP) tool servers, resources, prompts, and JSON-RPC transport bridges.
+license: MIT
+version: 1.2.0
+---
+
+# Model Context Protocol Rules
+
+1. Define resources with URI templates: \`file:///\`, \`postgres:///\`, \`github:///\`.
+2. Expose tools with explicit JSON Schema parameters and structured return payloads.
+3. Support Stdio and SSE transports for client connections.
+`,
+    lastIndexedAt: '2026-08-31T12:00:00.000Z',
+    createdAt: '2025-08-05T00:00:00.000Z',
+    updatedAt: '2026-08-31T00:00:00.000Z',
+  },
+
+  // 34. AI/ML - AutoGen Multi-Agent Orchestrator
+  {
+    id: 'skill-autogen-multi-agent-orchestrator',
+    slug: 'autogen-multi-agent-orchestrator',
+    name: 'AutoGen Multi-Agent Conversational Workflows',
+    description: 'Design multi-agent group chats, role-based handoffs, code execution sandboxes, and round-robin agent coordination.',
+    category: 'ai-ml',
+    tags: ['AutoGen', 'Multi-Agent', 'GroupChat', 'Coordination', 'Python'],
+    sourceRepository: SEED_REPOSITORIES['opencode-lab'],
+    sourcePath: 'skills/autogen-multi-agent-orchestrator',
+    sourceUrl: 'https://github.com/microsoft/autogen',
+    license: 'MIT',
+    version: '2.1.0',
+    commitSha: '5e7a33b',
+    compatibility: ['universal', 'claude', 'codex', 'cursor', 'opencode', 'gemini'],
+    trustLevel: 'Community',
+    installs: 29800,
+    favorites: 5410,
+    isVerified: true,
+    isFeatured: false,
+    security: {
+      isMetadataValid: true,
+      isLicenseDetected: true,
+      isSourceVerified: true,
+      containsScripts: false,
+      requiresEnvironmentVariables: false,
+      requiresExternalDependencies: false,
+      executableFiles: [],
+      securityScore: 100,
+      warnings: [],
+    },
+    files: [{ path: 'SKILL.md', type: 'file', size: 2900, isExecutable: false }],
+    instructions: `---
+name: autogen-multi-agent-orchestrator
+description: Design multi-agent group chats, role-based handoffs, code execution sandboxes, and round-robin agent coordination.
+license: MIT
+version: 2.1.0
+---
+
+# AutoGen Architecture Guidelines
+
+1. Define clear agent roles: AssistantAgent (planner), UserProxyAgent (executor), CriticAgent (reviewer).
+2. Set termination conditions with \`is_termination_msg\` to prevent infinite loops.
+3. Sandbox external code execution inside Docker container environments.
+`,
+    lastIndexedAt: '2026-08-31T12:00:00.000Z',
+    createdAt: '2025-08-10T00:00:00.000Z',
+    updatedAt: '2026-08-30T00:00:00.000Z',
+  },
+
+  // 35. AI/ML - CrewAI Task Delegation
+  {
+    id: 'skill-crewai-task-delegation',
+    slug: 'crewai-task-delegation',
+    name: 'CrewAI Autonomous Role Playing & Task Delegation',
+    description: 'Hierarchical and sequential agent crews with role assignment, goal definitions, tool delegation, and memory caches.',
+    category: 'ai-ml',
+    tags: ['CrewAI', 'Agents', 'Autonomous', 'Delegation', 'Memory'],
+    sourceRepository: SEED_REPOSITORIES['opencode-lab'],
+    sourcePath: 'skills/crewai-task-delegation',
+    sourceUrl: 'https://github.com/crewAIInc/crewAI',
+    license: 'MIT',
+    version: '1.4.0',
+    commitSha: '8d2a19f',
+    compatibility: ['universal', 'claude', 'codex', 'cursor', 'opencode', 'gemini'],
+    trustLevel: 'Community',
+    installs: 27500,
+    favorites: 4890,
+    isVerified: true,
+    isFeatured: false,
+    security: {
+      isMetadataValid: true,
+      isLicenseDetected: true,
+      isSourceVerified: true,
+      containsScripts: false,
+      requiresEnvironmentVariables: false,
+      requiresExternalDependencies: false,
+      executableFiles: [],
+      securityScore: 100,
+      warnings: [],
+    },
+    files: [{ path: 'SKILL.md', type: 'file', size: 2800, isExecutable: false }],
+    instructions: `---
+name: crewai-task-delegation
+description: Hierarchical and sequential agent crews with role assignment, goal definitions, tool delegation, and memory caches.
+license: MIT
+version: 1.4.0
+---
+
+# CrewAI Agent Orchestration
+
+1. Explicitly specify Agent \`role\`, \`goal\`, and \`backstory\` to constrain behavior.
+2. Use \`Process.hierarchical\` when a manager agent must delegate tasks dynamically.
+3. Configure \`memory=True\` for short-term and entity contextual persistence.
+`,
+    lastIndexedAt: '2026-08-31T12:00:00.000Z',
+    createdAt: '2025-08-12T00:00:00.000Z',
+    updatedAt: '2026-08-29T00:00:00.000Z',
+  },
+
+  // 36. DATABASE - GraphRAG Knowledge Explorer
+  {
+    id: 'skill-graphrag-knowledge-explorer',
+    slug: 'graphrag-knowledge-explorer',
+    name: 'GraphRAG & Knowledge Graph Augmented Retrieval',
+    description: 'Build hybrid vector and knowledge graph retrieval pipelines using Neo4j, LangChain GraphIndex, and community clustering.',
+    category: 'database',
+    tags: ['GraphRAG', 'Neo4j', 'Knowledge-Graph', 'Vector-Search', 'Hybrid-Search'],
+    sourceRepository: SEED_REPOSITORIES['domoskills-official'],
+    sourcePath: 'skills/graphrag-knowledge-explorer',
+    sourceUrl: 'https://github.com/microsoft/graphrag',
+    license: 'MIT',
+    version: '2.0.1',
+    commitSha: '4f9e81b',
+    compatibility: ['universal', 'claude', 'codex', 'cursor', 'opencode', 'gemini'],
+    trustLevel: 'Official',
+    installs: 33100,
+    favorites: 6540,
+    isVerified: true,
+    isFeatured: true,
+    security: {
+      isMetadataValid: true,
+      isLicenseDetected: true,
+      isSourceVerified: true,
+      containsScripts: false,
+      requiresEnvironmentVariables: false,
+      requiresExternalDependencies: false,
+      executableFiles: [],
+      securityScore: 100,
+      warnings: [],
+    },
+    files: [{ path: 'SKILL.md', type: 'file', size: 3200, isExecutable: false }],
+    instructions: `---
+name: graphrag-knowledge-explorer
+description: Build hybrid vector and knowledge graph retrieval pipelines using Neo4j, LangChain GraphIndex, and community clustering.
+license: MIT
+version: 2.0.1
+---
+
+# GraphRAG Principles
+
+1. Extract entities and relationships with schema constraints.
+2. Build hierarchical Leiden community summaries for global dataset queries.
+3. Combine vector cosine similarity with Cypher multi-hop traversals for local context.
+`,
+    lastIndexedAt: '2026-08-31T12:00:00.000Z',
+    createdAt: '2025-08-15T00:00:00.000Z',
+    updatedAt: '2026-08-30T00:00:00.000Z',
+  },
+
+  // 37. TESTING - Playwright E2E Automation
+  {
+    id: 'skill-playwright-e2e-automation',
+    slug: 'playwright-e2e-automation',
+    name: 'Playwright End-to-End Test Automation',
+    description: 'Resilient end-to-end browser testing, auto-waiting locators, visual regression snapshots, and CI matrix execution with Playwright.',
+    category: 'testing',
+    tags: ['Playwright', 'E2E', 'Testing', 'Automation', 'CI/CD', 'TypeScript'],
+    sourceRepository: SEED_REPOSITORIES['domoskills-official'],
+    sourcePath: 'skills/playwright-e2e-automation',
+    sourceUrl: 'https://github.com/microsoft/playwright',
+    license: 'Apache-2.0',
+    version: '1.48.0',
+    commitSha: '3a1b77c',
+    compatibility: ['universal', 'claude', 'codex', 'cursor', 'opencode', 'copilot', 'gemini'],
+    trustLevel: 'Official',
+    installs: 41200,
+    favorites: 8190,
+    isVerified: true,
+    isFeatured: false,
+    security: {
+      isMetadataValid: true,
+      isLicenseDetected: true,
+      isSourceVerified: true,
+      containsScripts: false,
+      requiresEnvironmentVariables: false,
+      requiresExternalDependencies: false,
+      executableFiles: [],
+      securityScore: 100,
+      warnings: [],
+    },
+    files: [{ path: 'SKILL.md', type: 'file', size: 3000, isExecutable: false }],
+    instructions: `---
+name: playwright-e2e-automation
+description: Resilient end-to-end browser testing, auto-waiting locators, visual regression snapshots, and CI matrix execution with Playwright.
+license: Apache-2.0
+version: 1.48.0
+---
+
+# Playwright Test Guidelines
+
+1. Prefer user-facing locators: \`getByRole\`, \`getByText\`, \`getByLabel\`.
+2. Avoid hardcoded \`waitForTimeout()\`; rely on Playwright's built-in auto-waiting assertions.
+3. Isolate tests with fresh browser contexts and mock external APIs via \`page.route()\`.
+`,
+    lastIndexedAt: '2026-08-31T12:00:00.000Z',
+    createdAt: '2025-08-18T00:00:00.000Z',
+    updatedAt: '2026-08-31T00:00:00.000Z',
+  },
+
+  // 38. BACKEND - Stripe Payment Integration
+  {
+    id: 'skill-stripe-payment-integration',
+    slug: 'stripe-payment-integration',
+    name: 'Stripe Billing, Subscriptions & Webhook Security',
+    description: 'Full integration for Stripe Checkout, Customer Portal, recurring subscriptions, invoice handling, and cryptographic webhook verification.',
+    category: 'backend',
+    tags: ['Stripe', 'Payments', 'Subscriptions', 'Webhooks', 'Fintech'],
+    sourceRepository: SEED_REPOSITORIES['domoskills-official'],
+    sourcePath: 'skills/stripe-payment-integration',
+    sourceUrl: 'https://github.com/stripe/stripe-node',
+    license: 'MIT',
+    version: '16.8.0',
+    commitSha: '2d8e41a',
+    compatibility: ['universal', 'claude', 'codex', 'cursor', 'opencode', 'copilot', 'gemini'],
+    trustLevel: 'Official',
+    installs: 39500,
+    favorites: 7810,
+    isVerified: true,
+    isFeatured: false,
+    security: {
+      isMetadataValid: true,
+      isLicenseDetected: true,
+      isSourceVerified: true,
+      containsScripts: false,
+      requiresEnvironmentVariables: true,
+      requiresExternalDependencies: false,
+      executableFiles: [],
+      securityScore: 100,
+      warnings: [],
+    },
+    files: [{ path: 'SKILL.md', type: 'file', size: 3300, isExecutable: false }],
+    instructions: `---
+name: stripe-payment-integration
+description: Full integration for Stripe Checkout, Customer Portal, recurring subscriptions, invoice handling, and cryptographic webhook verification.
+license: MIT
+version: 16.8.0
+---
+
+# Stripe Integration Standards
+
+1. Verify webhook signatures using \`stripe.webhooks.constructEvent\` with the raw body buffer.
+2. Implement idempotent webhook handlers using database unique constraints on \`event.id\`.
+3. Never store credit card numbers on your server; always use Stripe Elements / Checkout Sessions.
+`,
+    lastIndexedAt: '2026-08-31T12:00:00.000Z',
+    createdAt: '2025-08-20T00:00:00.000Z',
+    updatedAt: '2026-08-30T00:00:00.000Z',
+  },
+
+  // 39. BACKEND - Rust WebAssembly Core
+  {
+    id: 'skill-rust-wasm-systems-core',
+    slug: 'rust-wasm-systems-core',
+    name: 'Rust & WebAssembly High-Performance Modules',
+    description: 'Compile high-speed Rust algorithms to WebAssembly with wasm-bindgen, memory views, and JS interoperability.',
+    category: 'backend',
+    tags: ['Rust', 'WebAssembly', 'Wasm', 'Performance', 'Systems'],
+    sourceRepository: SEED_REPOSITORIES['domoskills-official'],
+    sourcePath: 'skills/rust-wasm-systems-core',
+    sourceUrl: 'https://github.com/rustwasm/wasm-pack',
+    license: 'MIT',
+    version: '1.0.4',
+    commitSha: '1c7a92e',
+    compatibility: ['universal', 'claude', 'codex', 'cursor', 'opencode', 'gemini'],
+    trustLevel: 'Official',
+    installs: 26100,
+    favorites: 5120,
+    isVerified: true,
+    isFeatured: false,
+    security: {
+      isMetadataValid: true,
+      isLicenseDetected: true,
+      isSourceVerified: true,
+      containsScripts: false,
+      requiresEnvironmentVariables: false,
+      requiresExternalDependencies: false,
+      executableFiles: [],
+      securityScore: 100,
+      warnings: [],
+    },
+    files: [{ path: 'SKILL.md', type: 'file', size: 2900, isExecutable: false }],
+    instructions: `---
+name: rust-wasm-systems-core
+description: Compile high-speed Rust algorithms to WebAssembly with wasm-bindgen, memory views, and JS interoperability.
+license: MIT
+version: 1.0.4
+---
+
+# Rust & Wasm Compilation Rules
+
+1. Annotate exported structs and functions with \`#[wasm_bindgen]\`.
+2. Pass binary data between JS and Rust using \`Uint8Array\` and shared memory pointers.
+3. Build optimized release bundles with \`wasm-opt -O4\`.
+`,
+    lastIndexedAt: '2026-08-31T12:00:00.000Z',
+    createdAt: '2025-08-22T00:00:00.000Z',
+    updatedAt: '2026-08-31T00:00:00.000Z',
+  },
+
+  // 40. DATABASE - Redis Distributed Caching & Locks
+  {
+    id: 'skill-redis-distributed-caching',
+    slug: 'redis-distributed-caching',
+    name: 'Redis Distributed Caching, Redlock & Pub/Sub',
+    description: 'Architect low-latency Redis caching layers, distributed locking with Redlock, sliding-window rate limiters, and real-time Pub/Sub queues.',
+    category: 'database',
+    tags: ['Redis', 'Caching', 'Redlock', 'Rate-Limiting', 'Pub-Sub', 'In-Memory'],
+    sourceRepository: SEED_REPOSITORIES['domoskills-official'],
+    sourcePath: 'skills/redis-distributed-caching',
+    sourceUrl: 'https://github.com/redis/node-redis',
+    license: 'MIT',
+    version: '4.7.0',
+    commitSha: '9e3d12a',
+    compatibility: ['universal', 'claude', 'codex', 'cursor', 'opencode', 'copilot', 'gemini'],
+    trustLevel: 'Official',
+    installs: 38400,
+    favorites: 7450,
+    isVerified: true,
+    isFeatured: false,
+    security: {
+      isMetadataValid: true,
+      isLicenseDetected: true,
+      isSourceVerified: true,
+      containsScripts: false,
+      requiresEnvironmentVariables: false,
+      requiresExternalDependencies: false,
+      executableFiles: [],
+      securityScore: 100,
+      warnings: [],
+    },
+    files: [{ path: 'SKILL.md', type: 'file', size: 3100, isExecutable: false }],
+    instructions: `---
+name: redis-distributed-caching
+description: Architect low-latency Redis caching layers, distributed locking with Redlock, sliding-window rate limiters, and real-time Pub/Sub queues.
+license: MIT
+version: 4.7.0
+---
+
+# Redis Caching & Locking Rules
+
+1. Always specify an explicit TTL on cached keys to prevent unbounded memory growth.
+2. Use Redis transactions / Lua scripts for atomic operations (e.g. rate limiters).
+3. Acquire distributed locks using Redlock algorithm with auto-releasing timeouts.
+`,
+    lastIndexedAt: '2026-08-31T12:00:00.000Z',
+    createdAt: '2025-08-25T00:00:00.000Z',
+    updatedAt: '2026-08-30T00:00:00.000Z',
+  },
+
+  // 41. PRODUCTIVITY - Turborepo Monorepo Mastery
+  {
+    id: 'skill-turborepo-monorepo-mastery',
+    slug: 'turborepo-monorepo-mastery',
+    name: 'Turborepo High-Performance Monorepo Architecture',
+    description: 'High-speed build pipelines, remote artifact caching, package dependency graph optimization, and workspace sharing with Turborepo.',
+    category: 'productivity',
+    tags: ['Turborepo', 'Monorepo', 'Build-Cache', 'Pipelines', 'Workspaces'],
+    sourceRepository: SEED_REPOSITORIES['domoskills-official'],
+    sourcePath: 'skills/turborepo-monorepo-mastery',
+    sourceUrl: 'https://github.com/vercel/turborepo',
+    license: 'MPL-2.0',
+    version: '2.1.0',
+    commitSha: '5c2e11d',
+    compatibility: ['universal', 'claude', 'codex', 'cursor', 'opencode', 'copilot', 'gemini'],
+    trustLevel: 'Official',
+    installs: 35900,
+    favorites: 6980,
+    isVerified: true,
+    isFeatured: true,
+    security: {
+      isMetadataValid: true,
+      isLicenseDetected: true,
+      isSourceVerified: true,
+      containsScripts: false,
+      requiresEnvironmentVariables: false,
+      requiresExternalDependencies: false,
+      executableFiles: [],
+      securityScore: 100,
+      warnings: [],
+    },
+    files: [{ path: 'SKILL.md', type: 'file', size: 3000, isExecutable: false }],
+    instructions: `---
+name: turborepo-monorepo-mastery
+description: High-speed build pipelines, remote artifact caching, package dependency graph optimization, and workspace sharing with Turborepo.
+license: MPL-2.0
+version: 2.1.0
+---
+
+# Turborepo Architecture Rules
+
+1. Define topological pipeline dependencies in \`turbo.json\` with \`dependsOn: ["^build"]\`.
+2. Configure granular \`inputs\` and \`outputs\` to maximize remote cache hit ratios.
+3. Manage internal package exports using \`package.json\` subpath export maps.
+`,
+    lastIndexedAt: '2026-08-31T12:00:00.000Z',
+    createdAt: '2025-08-28T00:00:00.000Z',
+    updatedAt: '2026-08-31T00:00:00.000Z',
+  },
 ];
+
 
