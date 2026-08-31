@@ -26,8 +26,9 @@ import { AGENT_ADAPTERS, AGENT_TARGET_LIST } from '@domoskills/adapters';
 import { InteractiveTerminal } from '@/components/terminal/InteractiveTerminal';
 import { SkillCard } from '@/components/skills/SkillCard';
 import { DomoMascot } from '@/components/mascot/DomoMascot';
+import { AgentBeltCarousel } from '@/components/brands/AgentBeltCarousel';
 
-const CYCLING_WORDS = ['Frontend', 'Security', 'AI Agents', 'Cloud', 'DevOps', 'Architecture'];
+const CYCLING_WORDS = ['Frontend & React', 'OWASP Security', 'AI & RAG Agents', 'Cloud & Edge', 'DevOps & K8s', 'Clean Architecture'];
 
 export default function HomePage() {
   const router = useRouter();
@@ -69,8 +70,8 @@ export default function HomePage() {
             {/* Left Hero Column */}
             <div className="lg:col-span-7 space-y-7">
               
-              {/* Top Branding Pill with Mascot Avatar */}
-              <div className="inline-flex items-center gap-2.5 rounded-full border border-border bg-surface px-4 py-1.5 font-mono text-xs text-text-secondary">
+              {/* Top Branding Pill */}
+              <div className="inline-flex items-center gap-2.5 rounded-full border border-border bg-surface px-4 py-1.5 font-mono text-xs text-text-secondary shadow-sm">
                 <img
                   src="/assets/domodomo/domodomo-app-icon.png"
                   alt="Domo Mascot"
@@ -81,23 +82,16 @@ export default function HomePage() {
                 <span className="text-emerald-400 font-semibold">100% Free & Open Source</span>
               </div>
 
-              {/* Main Editorial Headline with Large Mascot */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <div className="space-y-3 flex-1">
-                  <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.08]">
-                    Open skills. <br />
-                    Smarter agents. <br />
-                    <span className="text-text-muted">Built for </span>
-                    <span className="inline-block border-b-2 border-white pb-0.5 text-white transition-all duration-300">
-                      {CYCLING_WORDS[wordIndex]}
-                    </span>
-                  </h1>
-                </div>
-                
-                {/* Big Domo Mascot Floating in Hero */}
-                <div className="hidden sm:block shrink-0 pt-2">
-                  <DomoMascot size="lg" variant="laptop" showBubble={true} bubbleText="Domo is compiling agent superpowers!" />
-                </div>
+              {/* Main Editorial Headline with Shimmer Animation */}
+              <div className="space-y-3">
+                <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.08]">
+                  Open skills. <br />
+                  Smarter agents. <br />
+                  <span className="text-text-muted">Supercharge </span>
+                  <span className="inline-block text-shimmer transition-all duration-300 font-black">
+                    {CYCLING_WORDS[wordIndex]}
+                  </span>
+                </h1>
               </div>
 
               <p className="font-sans text-base sm:text-lg text-text-secondary max-w-xl leading-relaxed">
@@ -106,7 +100,7 @@ export default function HomePage() {
 
               {/* Search Bar */}
               <form onSubmit={handleSearchSubmit} className="max-w-xl">
-                <div className="relative flex items-center rounded-lg border border-border bg-surface p-1.5 transition focus-within:border-white focus-within:ring-1 focus-within:ring-white">
+                <div className="relative flex items-center rounded-xl border border-border bg-surface p-1.5 transition focus-within:border-white focus-within:ring-1 focus-within:ring-white shadow-lg">
                   <Search className="ml-3 h-4 w-4 text-text-muted" />
                   <input
                     type="text"
@@ -117,7 +111,7 @@ export default function HomePage() {
                   />
                   <button
                     type="submit"
-                    className="rounded bg-white px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-black transition hover:bg-muted-white shrink-0"
+                    className="rounded-lg bg-white px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-black transition hover:bg-muted-white shrink-0 shadow-md"
                   >
                     Search
                   </button>
@@ -128,18 +122,18 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-4 pt-2 font-mono text-xs">
                 <Link
                   href="/explore"
-                  className="flex items-center gap-2 rounded border border-white bg-white px-5 py-2.5 font-bold uppercase tracking-wider text-black hover:bg-muted-white transition shadow-[0_0_20px_rgba(255,255,255,0.15)]"
+                  className="flex items-center gap-2 rounded-lg border border-white bg-white px-5 py-2.5 font-bold uppercase tracking-wider text-black hover:bg-muted-white transition shadow-[0_0_20px_rgba(255,255,255,0.15)]"
                 >
                   <span>Browse Catalog</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
 
                 <Link
-                  href="/doctor"
-                  className="flex items-center gap-2 rounded border border-border bg-surface px-5 py-2.5 font-semibold text-text-secondary hover:border-white hover:text-white transition"
+                  href="/submit"
+                  className="flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-2.5 font-semibold text-text-secondary hover:border-white hover:text-white transition"
                 >
-                  <Terminal className="h-4 w-4" />
-                  <span>Agent Doctor</span>
+                  <Sparkles className="h-4 w-4 text-emerald-400" />
+                  <span>Create / Submit Skill</span>
                 </Link>
 
                 <div className="hidden sm:flex items-center gap-4 text-text-muted pl-4 border-l border-border">
@@ -154,7 +148,7 @@ export default function HomePage() {
 
             </div>
 
-            {/* Right Hero Column: Animated Terminal */}
+            {/* Right Hero Column: Animated Terminal with Integrated Domo Mascot */}
             <div className="lg:col-span-5">
               <InteractiveTerminal initialCommand="npx domoskills add react-performance owasp-agent-guardian" />
             </div>
@@ -165,34 +159,9 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. TRUSTED OPEN SOURCES */}
+      {/* 2. BRANDS CONVEYOR BELT MARQUEE (Antigravity, Claude Code, Cursor, OpenAI) */}
       {/* ========================================================================= */}
-      <section className="border-b border-border bg-surface py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <div className="font-mono text-xs uppercase tracking-widest text-text-muted">
-                Curated & Indexed Repositories
-              </div>
-              <div className="font-sans text-sm font-semibold text-text-secondary mt-0.5">
-                Every skill preserves full original licensing and author attribution.
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-4 font-mono text-xs text-text-muted">
-              <span className="rounded border border-border bg-surface-raised px-3 py-1 text-white">
-                github.com/domoskills/official-agent-skills
-              </span>
-              <span className="rounded border border-border bg-surface-raised px-3 py-1 text-white">
-                github.com/anthropic-community
-              </span>
-              <span className="rounded border border-border bg-surface-raised px-3 py-1 text-white">
-                github.com/opencode-org
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AgentBeltCarousel />
 
       {/* ========================================================================= */}
       {/* 3. EXPLORE BY DOMAIN */}

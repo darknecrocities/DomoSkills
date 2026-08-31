@@ -68,63 +68,109 @@
     linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
 }
 
-/* Cursor Flashlight Spotlight Effect */
-.cursor-spotlight-layer {
-  pointer-events: none;
+/* Canvas Physics Polka Dots Background Layer */
+.physics-dots-canvas {
   position: fixed;
   inset: 0;
-  z-index: 30;
-  background: radial-gradient(
-    650px circle at var(--mouse-x) var(--mouse-y),
-    rgba(255, 255, 255, 0.045),
-    transparent 50%
-  );
-  transition: opacity 0.3s ease;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0; /* Always in background, behind cards and text */
 }
 
-/* Card Glow Effect on Hover */
+/* Card Glow & Physics Hover */
 .card-hover-border {
   position: relative;
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 10;
+  transition: border-color 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
 }
 
 .card-hover-border:hover {
-  border-color: rgba(255, 255, 255, 0.6);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.7);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 255, 255, 0.08);
 }
 
-/* Polka Dots Interactive Texture on Cards */
+/* Polka Dots Interactive Texture on Cards (Isolated behind card content) */
 .card-polkadot-hover {
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  z-index: 10;
+  background-color: #0d0d0d;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.35s ease;
 }
 
 .card-polkadot-hover::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.25) 1.25px, transparent 1.25px);
-  background-size: 14px 14px;
-  background-position: 0 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+  background-position: center center;
   opacity: 0;
-  transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(0.8);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
-  z-index: 1;
+  z-index: 1; /* Behind card content */
   border-radius: inherit;
-  mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
-  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
+  mask-image: radial-gradient(circle at center, black 30%, transparent 95%);
+  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 95%);
 }
 
 .card-polkadot-hover:hover::before {
   opacity: 1;
-  transform: scale(1.05);
+  transform: scale(1.22); /* Smooth zoom-in / pinch-out feel */
 }
 
 .card-polkadot-hover > * {
   position: relative;
-  z-index: 2;
+  z-index: 2; /* Always above dot texture */
+}
+
+/* Infinite Brand Belt Marquee Animation */
+@keyframes beltMarquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-belt-marquee {
+  display: flex;
+  width: max-content;
+  animation: beltMarquee 28s linear infinite;
+}
+
+.animate-belt-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Text Shimmer Sweep Animation */
+@keyframes textShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 1) 25%,
+    rgba(168, 85, 247, 0.9) 50%,
+    rgba(255, 255, 255, 1) 75%,
+    rgba(255, 255, 255, 0.7) 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textShimmer 4.5s linear infinite;
 }
 
 /* Smooth Interactive Scroll Reveal */
@@ -152,7 +198,7 @@ code, pre, kbd {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .cursor-spotlight-layer {
-    display: none !important;
+  .animate-belt-marquee {
+    animation: none !important;
   }
 }

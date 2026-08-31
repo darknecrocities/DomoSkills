@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Copy, Check, Terminal as TerminalIcon, Sparkles } from 'lucide-react';
+import { Copy, Check, Terminal as TerminalIcon, Sparkles, MessageSquare } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 
 interface TerminalProps {
@@ -15,11 +15,12 @@ export function InteractiveTerminal({
 }: TerminalProps) {
   const [copied, setCopied] = useState(false);
   const [inputVal, setInputVal] = useState('');
+  const [domoQuote, setDomoQuote] = useState('Domo ready to run skills!');
   const [history, setHistory] = useState<Array<{ command: string; output: string[] }>>([
     {
       command: 'npx domoskills add react-performance owasp-agent-guardian',
       output: [
-        'DOMOSKILLS_ v0.1.0 — The Open Agent Skills Registry',
+        'DOMOSKILLS_ — The Open Agent Skills Registry',
         '[info] Resolving 2 skills for Universal Agent (.agent/skills)...',
         '[ok] Installed React Performance (react-performance) v1.4.2 [MIT]',
         '  > Location: .agent/skills/react-performance',
@@ -28,7 +29,7 @@ export function InteractiveTerminal({
         '  > Location: .agent/skills/owasp-agent-guardian',
         '  > Source: security-guardians/agent-security-skills (9e1a82b)',
         '',
-        '[ok] Successfully added 2 skills to Universal Agent Standard!',
+        '[ok] Successfully added 2 skills to Universal Agent workspace!',
         'Your AI agent is now equipped with these capabilities.',
       ],
     },
@@ -37,14 +38,25 @@ export function InteractiveTerminal({
   const [activeTab, setActiveTab] = useState<'demo' | 'cli'>('demo');
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Copy handler
   const handleCopy = () => {
     navigator.clipboard.writeText(initialCommand);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Interactive command runner
+  const handleDomoClick = () => {
+    const quotes = [
+      'Type "help" to see CLI commands!',
+      'Type "doctor" to run diagnostic checks!',
+      'Type "search react" for UI capabilities!',
+      'Type "audit" for AST security analysis!',
+    ];
+    const nextQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    setDomoQuote(nextQuote);
+    setActiveTab('cli');
+    setInputVal('doctor');
+  };
+
   const handleCommandSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const raw = inputVal.trim();
@@ -85,7 +97,7 @@ export function InteractiveTerminal({
           '[ok] Node.js runtime detected: v24.13.0',
           '[ok] Git detected: git version 2.45.1',
           '[ok] Agent workspace detected: OpenCode & Cursor (.agent/skills)',
-          '[ok] Configured target: Universal Agent Standard',
+          '[ok] Universal Agent Configuration: Active',
           '[ok] All diagnostics passed. Ready for skills.',
         ];
         break;
@@ -134,7 +146,7 @@ export function InteractiveTerminal({
   }, [history, activeTab]);
 
   return (
-    <div className="w-full rounded-lg border border-border bg-surface-raised shadow-2xl overflow-hidden font-mono text-xs">
+    <div className="relative w-full rounded-2xl border border-border bg-surface-raised shadow-2xl overflow-hidden font-mono text-xs card-polkadot-hover">
       
       {/* Terminal Window Header */}
       <div className="flex items-center justify-between border-b border-border bg-surface px-4 py-3">
@@ -145,7 +157,7 @@ export function InteractiveTerminal({
             <span className="h-3 w-3 rounded-full bg-border-bright/60 hover:bg-emerald-500/80 transition cursor-pointer"></span>
           </div>
           <div className="ml-3 flex items-center gap-2 text-text-muted text-[11px]">
-            <TerminalIcon className="h-3.5 w-3.5" />
+            <TerminalIcon className="h-3.5 w-3.5 text-white" />
             <span className="font-semibold text-text-secondary">domoskills-terminal</span>
             <span className="hidden sm:inline text-text-faint">— zsh 80×24</span>
           </div>
@@ -187,7 +199,7 @@ export function InteractiveTerminal({
       </div>
 
       {/* Terminal Screen Body */}
-      <div className="p-4 sm:p-6 bg-background/95 min-h-[260px] max-h-[360px] overflow-y-auto space-y-4">
+      <div className="p-4 sm:p-6 bg-background/95 min-h-[280px] max-h-[360px] overflow-y-auto space-y-4 pb-16">
         
         {activeTab === 'demo' ? (
           <div>
@@ -197,8 +209,8 @@ export function InteractiveTerminal({
             </div>
             
             <div className="space-y-1 text-text-muted">
-              <div className="text-white font-bold">DOMOSKILLS_ v0.1.0 — The Open Agent Skills Registry</div>
-              <div className="text-cyan-400">ℹ Resolving 2 skills for Universal Agent Standard...</div>
+              <div className="text-white font-bold">DOMOSKILLS_ — The Open Agent Skills Registry</div>
+              <div className="text-cyan-400">ℹ Resolving 2 skills for Universal Agent...</div>
               <div className="text-emerald-400">✔ react-performance <span className="text-text-muted">[v1.4.2 • MIT • Verified]</span></div>
               <div className="text-emerald-400">✔ owasp-agent-guardian <span className="text-text-muted">[v3.0.1 • MIT • Official]</span></div>
               <div className="py-2 text-text-secondary">
@@ -244,7 +256,7 @@ export function InteractiveTerminal({
                 type="text"
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
-                placeholder="type a command..."
+                placeholder="type a command (e.g. 'doctor' or 'help')..."
                 className="w-full bg-transparent text-white focus:outline-none placeholder:text-text-faint"
                 autoFocus
               />
@@ -252,6 +264,37 @@ export function InteractiveTerminal({
             <div ref={bottomRef} />
           </div>
         )}
+
+      </div>
+
+      {/* Mascot Station on Bottom-Left of the Terminal Card */}
+      <div className="absolute bottom-3 left-3 z-30 flex items-center gap-3">
+        
+        {/* Animated Domo Mascot Avatar */}
+        <button
+          type="button"
+          onClick={handleDomoClick}
+          className="group relative flex h-14 w-14 items-center justify-center rounded-xl border border-white/30 bg-surface-raised/95 p-1 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:border-white"
+          title="Click Domo to run a test CLI command!"
+        >
+          <img
+            src="/assets/domodomo/domolaptop.gif"
+            alt="Domo Terminal Assistant"
+            className="h-full w-full object-contain"
+          />
+          <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 text-[8px] font-bold text-black ring-2 ring-background">
+            ✓
+          </span>
+        </button>
+
+        {/* Mascot Speech / Tip Bubble */}
+        <div
+          onClick={handleDomoClick}
+          className="cursor-pointer rounded-lg border border-border bg-surface/95 px-3 py-1.5 font-mono text-[11px] text-white shadow-md backdrop-blur-md transition hover:border-white/60 flex items-center gap-2"
+        >
+          <span className="text-emerald-400 font-bold">Domo:</span>
+          <span>{domoQuote}</span>
+        </div>
 
       </div>
 
