@@ -167,6 +167,7 @@ export const SkillSchema = z.object({
   }),
   files: z.array(SkillFileSchema).default([]),
   instructions: z.string().default(''),
+  previewImage: z.string().optional(),
   lastIndexedAt: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
