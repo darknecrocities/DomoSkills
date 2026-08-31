@@ -1,0 +1,21 @@
+{
+  "name": "@domoskills/validators",
+  "version": "0.1.0",
+  "description": "Zod schemas and validation rules for DomoSkills skills, manifests, submissions, and repositories",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@domoskills/registry",
+  "version": "0.1.0",
+  "description": "Skill registry, repository ingestion abstraction, seed database, and search engine for DomoSkills",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@domoskills/adapters": "workspace:*",
+    "@domoskills/skill-parser": "workspace:*",
+    "@domoskills/validators": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  }
+}

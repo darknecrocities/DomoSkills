@@ -1,0 +1,19 @@
+{
+  "name": "domoskills-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DomoSkills — The Open Agent Skills Marketplace & Registry",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "type-check": "turbo run type-check",
+    "cli": "node packages/cli/bin/domoskills.js"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.4",
+    "typescript": "^5.8.2"
+  },
+  "packageManager": "pnpm@11.5.0"
+}

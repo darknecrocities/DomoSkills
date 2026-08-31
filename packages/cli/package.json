@@ -1,0 +1,28 @@
+{
+  "name": "domoskills",
+  "version": "0.1.0",
+  "description": "Developer CLI for discovering, managing, and installing AI Agent Skills",
+  "main": "./dist/index.js",
+  "bin": {
+    "domoskills": "./bin/domoskills.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@domoskills/adapters": "workspace:*",
+    "@domoskills/registry": "workspace:*",
+    "@domoskills/skill-parser": "workspace:*",
+    "@domoskills/validators": "workspace:*",
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.19",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  }
+}
