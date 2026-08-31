@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk, JetBrains_Mono, Inter } from 'next/font/google';
+import { Space_Grotesk, JetBrains_Mono, Lora, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { AppShell } from '@/components/layout/AppShell';
 
@@ -12,6 +12,18 @@ const spaceGrotesk = Space_Grotesk({
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
+  display: 'swap',
+});
+
+const lora = Lora({
+  subsets: ['latin'],
+  variable: '--font-anthropic',
+  display: 'swap',
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-openai',
   display: 'swap',
 });
 
@@ -44,7 +56,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} dark`}>
+    <html
+      lang="en"
+      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${lora.variable} ${plusJakarta.variable} dark`}
+    >
       <body className="bg-background text-white antialiased selection:bg-white selection:text-black min-h-screen flex flex-col justify-between">
         <AppShell>{children}</AppShell>
       </body>
