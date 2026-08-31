@@ -59,10 +59,11 @@ const AGENT_BRANDS: AgentBrand[] = [
     category: 'AI Code Editor',
     fontClass: 'font-mono font-bold tracking-tight',
     logo: (
-      <svg className="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2l9 5.5v9L12 22l-9-5.5v-9L12 2z" stroke="#38BDF8" strokeWidth="1.8" strokeLinejoin="round" />
-        <path d="M12 2v20M21 7.5l-9 5M3 7.5l9 5" stroke="#38BDF8" strokeWidth="1.8" strokeLinejoin="round" />
-      </svg>
+      <img
+        src="/brands/cursor.png"
+        alt="Cursor"
+        className="h-6 w-6 shrink-0 object-contain rounded-md shadow-sm"
+      />
     ),
   },
   {
@@ -82,10 +83,11 @@ const AGENT_BRANDS: AgentBrand[] = [
     category: 'Agent Synthesis',
     fontClass: 'font-mono font-bold tracking-tight',
     logo: (
-      <svg className="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="4" width="18" height="16" rx="3" stroke="#2DD4BF" strokeWidth="2" />
-        <path d="M7 10l3 2-3 2M13 14h4" stroke="#2DD4BF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+      <img
+        src="/brands/codex.png"
+        alt="OpenAI Codex"
+        className="h-6 w-6 shrink-0 object-contain rounded-md shadow-sm"
+      />
     ),
   },
   {
@@ -94,9 +96,11 @@ const AGENT_BRANDS: AgentBrand[] = [
     category: 'Universal Open Agent',
     fontClass: 'font-mono font-black tracking-wider',
     logo: (
-      <svg className="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none">
-        <path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" stroke="#F472B6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+      <img
+        src="/brands/opencode.png"
+        alt="OpenCode"
+        className="h-6 w-6 shrink-0 object-contain rounded-md shadow-sm"
+      />
     ),
   },
   {
