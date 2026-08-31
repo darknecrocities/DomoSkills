@@ -172,12 +172,15 @@ export default function HomePage() {
                   <span>Create / Submit Skill</span>
                 </Link>
 
-                <div className="hidden sm:flex items-center gap-4 text-text-muted pl-4 border-l border-border">
+                <div className="hidden sm:flex items-center gap-4 text-text-muted pl-4 border-l border-border font-mono text-xs">
                   <div>
-                    <span className="text-white font-bold">{stats.totalSkills}+</span> Skills
+                    <span className="text-white font-bold">{stats.totalSkills}</span> Skills
                   </div>
                   <div>
                     <span className="text-white font-bold">{(stats.totalInstalls / 1000).toFixed(0)}k+</span> Installs
+                  </div>
+                  <div>
+                    <span className="text-white font-bold">{stats.totalRepositories}</span> Repositories
                   </div>
                 </div>
               </div>

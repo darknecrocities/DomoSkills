@@ -317,37 +317,6 @@ export function InteractiveTerminal({
 
       </div>
 
-      {/* DomoDomo Signature Frameless Mascot Overlay on Bottom-Right Corner */}
-      <div className="absolute -bottom-6 -right-5 sm:-bottom-8 sm:-right-6 z-40 flex items-end pointer-events-auto select-none">
-        
-        {/* Floating Speech Bubble */}
-        {showQuote && (
-          <div
-            onClick={handleDomoClick}
-            className="mb-14 mr-[-10px] cursor-pointer rounded-xl border border-white/20 bg-surface/95 px-3 py-1.5 font-mono text-[11px] text-white shadow-xl backdrop-blur-md transition hover:scale-105 hover:border-white animate-bounce-subtle flex items-center gap-1.5"
-            style={{ animationDuration: '3s' }}
-          >
-            <span className="text-emerald-400 font-bold">Domo:</span>
-            <span>{domoQuote}</span>
-          </div>
-        )}
-
-        {/* Frameless Animated Domo Mascot sitting on bottom-right */}
-        <button
-          type="button"
-          onClick={handleDomoClick}
-          className="group relative cursor-pointer p-0 bg-transparent border-0 outline-none transition-transform duration-300 hover:scale-110 active:scale-95 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
-          title="Click Domo to run an automated diagnostic command!"
-        >
-          <img
-            src="/assets/domodomo/domolaptop.gif"
-            alt="Domo Terminal Mascot"
-            className="h-28 w-28 sm:h-32 sm:w-32 object-contain"
-          />
-        </button>
-
-      </div>
-
     </div>
   );
 }

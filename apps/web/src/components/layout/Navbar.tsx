@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Terminal, ShoppingBag, Plus, Menu, X, Shield, Activity, Github } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, Github, User, LogOut, Sparkles, Layers, ChevronDown } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { useAuth } from '@/context/AuthContext';
 
 interface NavbarProps {
   onOpenCommandPalette?: () => void;
@@ -13,7 +14,9 @@ interface NavbarProps {
 export function Navbar({ onOpenCommandPalette }: NavbarProps) {
   const pathname = usePathname();
   const { skills, isDrawerOpen, setDrawerOpen } = useCartStore();
+  const { user, openAuthModal, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const cartCount = skills.length;
 
@@ -94,7 +97,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
             href="https://github.com/darknecrocities/DomoSkills"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-1.5 font-mono text-xs text-white transition hover:border-white hover:bg-surface-raised group"
+            className="hidden lg:flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-1.5 font-mono text-xs text-white transition hover:border-white hover:bg-surface-raised group"
           >
             <Github className="h-3.5 w-3.5 text-text-secondary group-hover:text-white" />
             <span className="font-semibold">Star</span>
@@ -122,6 +125,70 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
             )}
           </button>
 
+          {/* User Auth Section */}
+          {user ? (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                className="flex items-center gap-2 rounded-xl border border-border bg-surface-raised px-2.5 py-1.5 font-mono text-xs text-white hover:border-white transition"
+              >
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt={user.displayName || 'User'} className="h-5 w-5 rounded-full object-cover" />
+                ) : (
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-black font-bold text-[10px]">
+                    {user.displayName?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                )}
+                <span className="hidden sm:inline font-bold">{user.displayName || 'Developer'}</span>
+                <ChevronDown className="h-3 w-3 text-text-muted" />
+              </button>
+
+              {userDropdownOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-surface-raised p-2 shadow-2xl z-50 font-mono text-xs animate-fade-in"
+                  onClick={() => setUserDropdownOpen(false)}
+                >
+                  <div className="px-3 py-2 border-b border-border/80 text-text-muted text-[11px]">
+                    Signed in as <br />
+                    <span className="text-white font-bold truncate block">{user.email}</span>
+                  </div>
+                  <Link
+                    href="/explore"
+                    className="flex items-center gap-2 px-3 py-2 rounded text-text-secondary hover:text-white hover:bg-surface transition mt-1"
+                  >
+                    <Layers className="h-3.5 w-3.5" />
+                    <span>My Stacks & Cart</span>
+                  </Link>
+                  <Link
+                    href="/submit"
+                    className="flex items-center gap-2 px-3 py-2 rounded text-text-secondary hover:text-white hover:bg-surface transition"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Publish Agent Skill</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded text-red-400 hover:text-red-300 hover:bg-red-950/30 transition text-left mt-1 border-t border-border/60"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    <span>Log Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => openAuthModal('signin')}
+              className="flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-white hover:border-white hover:bg-surface-raised transition shadow-sm"
+            >
+              <User className="h-3.5 w-3.5 text-emerald-400" />
+              <span>Sign In</span>
+            </button>
+          )}
+
           {/* Mobile Menu Toggle */}
           <button
             type="button"
@@ -137,22 +204,47 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="border-b border-border bg-surface-raised px-4 py-4 md:hidden animate-fade-in">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 font-mono text-xs">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 font-mono text-sm uppercase tracking-wider text-text-secondary hover:bg-surface hover:text-white rounded"
+                className="px-3 py-2 uppercase tracking-wider text-text-secondary hover:bg-surface hover:text-white rounded"
               >
                 {link.label}
               </Link>
             ))}
+            {!user ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openAuthModal('signin');
+                }}
+                className="flex items-center gap-2 px-3 py-2 text-left uppercase tracking-wider text-emerald-400 hover:bg-surface rounded font-bold"
+              >
+                <User className="h-4 w-4" />
+                <span>Sign In / Register</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  logout();
+                }}
+                className="flex items-center gap-2 px-3 py-2 text-left uppercase tracking-wider text-red-400 hover:bg-surface rounded font-bold"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Log Out ({user.displayName})</span>
+              </button>
+            )}
             <a
-              href="https://github.com/domoskills/domoskills"
+              href="https://github.com/darknecrocities/DomoSkills"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 font-mono text-sm uppercase tracking-wider text-text-secondary hover:bg-surface hover:text-white rounded"
+              className="flex items-center gap-2 px-3 py-2 uppercase tracking-wider text-text-secondary hover:bg-surface hover:text-white rounded"
             >
               <Github className="h-4 w-4" />
               <span>GitHub Repository</span>

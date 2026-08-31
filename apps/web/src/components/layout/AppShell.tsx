@@ -7,6 +7,8 @@ import { CursorSpotlight } from '../effects/CursorSpotlight';
 import { SkillCartDrawer } from '../cart/SkillCartDrawer';
 import { InstallModal } from '../modals/InstallModal';
 import { CommandPalette } from '../command/CommandPalette';
+import { AuthProvider } from '@/context/AuthContext';
+import { AuthModal } from '../auth/AuthModal';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -16,26 +18,29 @@ export function AppShell({ children }: AppShellProps) {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-between">
-      {/* Background Spotlight */}
-      <CursorSpotlight />
+    <AuthProvider>
+      <div className="relative min-h-screen flex flex-col justify-between">
+        {/* Background Spotlight */}
+        <CursorSpotlight />
 
-      {/* Top Navigation */}
-      <Navbar onOpenCommandPalette={() => setCommandPaletteOpen(true)} />
+        {/* Top Navigation */}
+        <Navbar onOpenCommandPalette={() => setCommandPaletteOpen(true)} />
 
-      {/* Main Content Body */}
-      <main className="flex-1 w-full">{children}</main>
+        {/* Main Content Body */}
+        <main className="flex-1 w-full">{children}</main>
 
-      {/* Footer */}
-      <Footer />
+        {/* Footer */}
+        <Footer />
 
-      {/* Overlays & Drawers */}
-      <SkillCartDrawer />
-      <InstallModal />
-      <CommandPalette
-        isOpen={commandPaletteOpen}
-        onClose={() => setCommandPaletteOpen(false)}
-      />
-    </div>
+        {/* Overlays, Modals & Drawers */}
+        <SkillCartDrawer />
+        <InstallModal />
+        <AuthModal />
+        <CommandPalette
+          isOpen={commandPaletteOpen}
+          onClose={() => setCommandPaletteOpen(false)}
+        />
+      </div>
+    </AuthProvider>
   );
 }

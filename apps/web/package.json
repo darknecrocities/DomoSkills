@@ -15,6 +15,7 @@
     "@domoskills/skill-parser": "workspace:*",
     "@domoskills/validators": "workspace:*",
     "clsx": "^2.1.1",
+    "firebase": "^12.18.0",
     "framer-motion": "^12.4.7",
     "lucide-react": "^0.475.0",
     "next": "^14.2.24",
