@@ -454,10 +454,6 @@ ${builderInstructions}
                 {submissionResult.docId && (
                   <div className="mt-3 flex flex-wrap items-center gap-3 pt-3 border-t border-border/40 text-[11px] text-text-muted">
                     <span>
-                      Firestore Ref: <code className="text-emerald-400">{submissionResult.docId}</code>
-                    </span>
-                    <span>•</span>
-                    <span>
                       Install: <code className="text-white">npx domoskills add {submissionResult.slug}</code>
                     </span>
                   </div>
