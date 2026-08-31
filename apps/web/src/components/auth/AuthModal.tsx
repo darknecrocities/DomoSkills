@@ -79,7 +79,7 @@ export function AuthModal() {
             {/* Header Brand */}
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden shadow-md">
-                <img src="/icon.png" alt="DomoSkills" className="h-9 w-9 object-cover" />
+                <img src="/domo-mascot.png" alt="DomoSkills" className="h-9 w-9 object-cover" />
               </div>
               <div className="font-mono text-sm font-extrabold tracking-wider text-white">
                 DOMOSKILLS
