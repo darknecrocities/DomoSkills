@@ -42,25 +42,17 @@ function ExploreContent() {
 
   // Query registry
   const searchResults = useMemo(() => {
-    const res = registry.getSkills({
+    return registry.getSkills({
       query,
-      category: selectedCategory,
+      category: visualPreviewOnly ? 'all' : selectedCategory,
       agent: selectedAgent,
       trustLevel: selectedTrust,
       license: selectedLicense,
       hasScripts: hasScriptsOnly,
+      hasVisualPreview: visualPreviewOnly,
       sortBy,
-      limit: 100,
+      limit: 500,
     });
-    if (visualPreviewOnly) {
-      const filtered = res.skills.filter((s) => Boolean(s.previewImage));
-      return {
-        ...res,
-        skills: filtered,
-        total: filtered.length,
-      };
-    }
-    return res;
   }, [query, selectedCategory, selectedAgent, selectedTrust, selectedLicense, hasScriptsOnly, sortBy, visualPreviewOnly]);
 
   const handleAddAllFiltered = () => {
@@ -151,9 +143,12 @@ function ExploreContent() {
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none font-mono text-xs">
           <button
             type="button"
-            onClick={() => setSelectedCategory('all')}
+            onClick={() => {
+              setSelectedCategory('all');
+              setVisualPreviewOnly(false);
+            }}
             className={`px-3 py-1.5 rounded border whitespace-nowrap transition ${
-              selectedCategory === 'all'
+              selectedCategory === 'all' && !visualPreviewOnly
                 ? 'border-white bg-white text-black font-bold'
                 : 'border-border bg-surface text-text-secondary hover:text-white hover:border-border-bright'
             }`}
@@ -162,7 +157,13 @@ function ExploreContent() {
           </button>
           <button
             type="button"
-            onClick={() => setVisualPreviewOnly(!visualPreviewOnly)}
+            onClick={() => {
+              const next = !visualPreviewOnly;
+              setVisualPreviewOnly(next);
+              if (next) {
+                setSelectedCategory('all');
+              }
+            }}
             className={`px-3 py-1.5 rounded border whitespace-nowrap transition flex items-center gap-1.5 ${
               visualPreviewOnly
                 ? 'border-emerald-400 bg-emerald-950/60 text-emerald-300 font-bold'
@@ -174,12 +175,15 @@ function ExploreContent() {
           </button>
           {categories.map((cat) => {
             const count = registry.getAllSkills().filter((s) => s.category === cat.slug).length;
-            const isSelected = selectedCategory === cat.slug;
+            const isSelected = selectedCategory === cat.slug && !visualPreviewOnly;
             return (
               <button
                 key={cat.slug}
                 type="button"
-                onClick={() => setSelectedCategory(cat.slug)}
+                onClick={() => {
+                  setSelectedCategory(cat.slug);
+                  setVisualPreviewOnly(false);
+                }}
                 className={`px-3 py-1.5 rounded border whitespace-nowrap transition ${
                   isSelected
                     ? 'border-white bg-white text-black font-bold'

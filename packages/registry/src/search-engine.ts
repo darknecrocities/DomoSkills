@@ -21,6 +21,7 @@ export class SkillSearchEngine {
       license = 'all',
       trustLevel = 'all',
       hasScripts,
+      hasVisualPreview,
       featuredOnly,
       sortBy = 'trending',
       sortDirection = 'desc',
@@ -33,6 +34,11 @@ export class SkillSearchEngine {
 
     // Filter skills
     let filtered = this.skills.filter((skill) => {
+      // Visual preview filter
+      if (hasVisualPreview && !skill.previewImage) {
+        return false;
+      }
+
       // Category filter
       if (category !== 'all' && skill.category !== category) {
         return false;

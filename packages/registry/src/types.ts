@@ -49,6 +49,7 @@ export interface SkillFilterOptions {
   license?: License | 'all';
   trustLevel?: TrustLevel | 'all';
   hasScripts?: boolean;
+  hasVisualPreview?: boolean;
   featuredOnly?: boolean;
   sortBy?: 'trending' | 'installs' | 'favorites' | 'updated' | 'newest' | 'alphabetical';
   sortDirection?: 'asc' | 'desc';
