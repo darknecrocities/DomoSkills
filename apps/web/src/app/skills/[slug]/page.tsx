@@ -21,6 +21,7 @@ import {
   Code2,
   CheckCircle2,
   AlertTriangle,
+  Eye,
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { AGENT_TARGET_LIST, getAdapter, generateInstallCommand } from '@domoskills/adapters';
@@ -40,7 +41,10 @@ export default function SkillDetailPage() {
   const { targetAgent, hasSkill, toggleSkill, setTargetAgent } = useCartStore();
   const isSelected = hasSkill(skill.slug);
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'instructions' | 'files' | 'attribution' | 'compatibility'>('instructions');
+  const [promptCopied, setPromptCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState<'preview' | 'instructions' | 'files' | 'attribution' | 'compatibility'>(
+    skill.previewImage ? 'preview' : 'instructions'
+  );
 
   const adapter = getAdapter(targetAgent);
   const installCmd = generateInstallCommand([skill.slug], targetAgent);
@@ -49,6 +53,12 @@ export default function SkillDetailPage() {
     navigator.clipboard.writeText(installCmd);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyPrompt = () => {
+    navigator.clipboard.writeText(skill.prompt || skill.description);
+    setPromptCopied(true);
+    setTimeout(() => setPromptCopied(false), 2000);
   };
 
   return (
@@ -201,11 +211,25 @@ export default function SkillDetailPage() {
 
         {/* Tab Navigation */}
         <div>
-          <div className="flex border-b border-border font-mono text-xs">
+          <div className="flex border-b border-border font-mono text-xs overflow-x-auto">
+            {skill.previewImage && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('preview')}
+                className={`px-5 py-3 border-b-2 font-semibold transition flex items-center gap-2 shrink-0 ${
+                  activeTab === 'preview'
+                    ? 'border-white text-white font-bold'
+                    : 'border-transparent text-text-muted hover:text-white'
+                }`}
+              >
+                <Eye className="h-3.5 w-3.5 text-emerald-400" />
+                <span>0. Visual Design & Prompt Preview</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setActiveTab('instructions')}
-              className={`px-5 py-3 border-b-2 font-semibold transition ${
+              className={`px-5 py-3 border-b-2 font-semibold transition shrink-0 ${
                 activeTab === 'instructions'
                   ? 'border-white text-white font-bold'
                   : 'border-transparent text-text-muted hover:text-white'
@@ -216,7 +240,7 @@ export default function SkillDetailPage() {
             <button
               type="button"
               onClick={() => setActiveTab('files')}
-              className={`px-5 py-3 border-b-2 font-semibold transition ${
+              className={`px-5 py-3 border-b-2 font-semibold transition shrink-0 ${
                 activeTab === 'files'
                   ? 'border-white text-white font-bold'
                   : 'border-transparent text-text-muted hover:text-white'
@@ -227,7 +251,7 @@ export default function SkillDetailPage() {
             <button
               type="button"
               onClick={() => setActiveTab('attribution')}
-              className={`px-5 py-3 border-b-2 font-semibold transition ${
+              className={`px-5 py-3 border-b-2 font-semibold transition shrink-0 ${
                 activeTab === 'attribution'
                   ? 'border-white text-white font-bold'
                   : 'border-transparent text-text-muted hover:text-white'
@@ -238,7 +262,7 @@ export default function SkillDetailPage() {
             <button
               type="button"
               onClick={() => setActiveTab('compatibility')}
-              className={`px-5 py-3 border-b-2 font-semibold transition ${
+              className={`px-5 py-3 border-b-2 font-semibold transition shrink-0 ${
                 activeTab === 'compatibility'
                   ? 'border-white text-white font-bold'
                   : 'border-transparent text-text-muted hover:text-white'
@@ -251,6 +275,112 @@ export default function SkillDetailPage() {
 
         {/* Tab Content Panes */}
         <div className="space-y-6">
+
+          {/* TAB 0: Visual Design & Exact Prompt Preview */}
+          {activeTab === 'preview' && skill.previewImage && (
+            <div className="rounded-xl border border-border bg-surface p-6 sm:p-8 space-y-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-emerald-400" />
+                    <h2 className="font-sans text-xl font-bold text-white">
+                      Authentic Website Design & Matching Agent Prompt
+                    </h2>
+                  </div>
+                  <p className="font-sans text-xs text-text-muted mt-1">
+                    Direct open-source screenshot corresponding 1:1 with the recreation prompt and guidelines below.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleCopyPrompt}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white bg-white px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-black transition hover:bg-muted-white shrink-0 shadow-md"
+                >
+                  {promptCopied ? (
+                    <>
+                      <Check className="h-4 w-4 text-emerald-600" />
+                      <span>Prompt Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4" />
+                      <span>Copy Design Prompt</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Split Screen Layout: Website Preview + Matching Prompt */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Left: High Resolution Screenshot Frame */}
+                <div className="lg:col-span-7 space-y-3">
+                  <div className="flex items-center justify-between font-mono text-xs text-text-muted">
+                    <span className="font-semibold text-white flex items-center gap-1.5">
+                      <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
+                      Live Design Screenshot
+                    </span>
+                    <span className="rounded border border-border px-2 py-0.5 text-[11px]">
+                      Source: {skill.sourceRepository.owner}/{skill.sourceRepository.repository}
+                    </span>
+                  </div>
+                  <div className="overflow-hidden rounded-xl border border-border bg-black shadow-2xl">
+                    <div className="flex items-center gap-1.5 border-b border-border/80 bg-surface-raised px-4 py-2.5">
+                      <div className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
+                      <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
+                      <div className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
+                      <div className="ml-2 flex-1 rounded bg-surface px-3 py-1 font-mono text-[11px] text-text-muted truncate">
+                        preview://{skill.slug}.design
+                      </div>
+                    </div>
+                    <img
+                      src={skill.previewImage}
+                      alt={`${skill.name} website design reference preview`}
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* Right: Exact Matching Design Prompt */}
+                <div className="lg:col-span-5 space-y-4">
+                  <div className="flex items-center justify-between font-mono text-xs text-text-muted">
+                    <span className="font-semibold text-white">Exact Matching Agent Prompt</span>
+                    <span className="text-emerald-400 font-bold text-[11px] uppercase tracking-wider">1:1 Target Match</span>
+                  </div>
+
+                  <div className="rounded-xl border border-border bg-black p-5 font-mono text-xs text-text-secondary leading-relaxed space-y-3 shadow-inner">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2 text-[11px] text-text-muted">
+                      <span>PROMPT.MD RECREATION SPEC</span>
+                      <button
+                        type="button"
+                        onClick={handleCopyPrompt}
+                        className="text-white hover:text-emerald-400 transition flex items-center gap-1"
+                      >
+                        {promptCopied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                        <span>{promptCopied ? 'Copied' : 'Copy'}</span>
+                      </button>
+                    </div>
+                    <pre className="whitespace-pre-wrap text-white/95 font-mono text-xs leading-relaxed overflow-x-auto">
+                      {skill.prompt || skill.description}
+                    </pre>
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-surface-raised p-4 space-y-2 text-xs text-text-secondary font-mono">
+                    <div className="flex items-center gap-1.5 text-white font-bold text-xs">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                      <span>How to prompt your agent</span>
+                    </div>
+                    <p className="text-[11px] text-text-muted leading-relaxed font-sans">
+                      Paste this prompt into Claude Code, Cursor, Codex, or your AI coding assistant alongside the installed skill (<code className="text-white">${skill.slug}</code>). The assistant will generate the exact website design architecture, layout, spacing, and styling shown in the screenshot.
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          )}
           
           {/* TAB 1: Instructions Markdown */}
           {activeTab === 'instructions' && (

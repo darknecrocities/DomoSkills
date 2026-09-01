@@ -13,6 +13,7 @@ import {
   RefreshCw,
   X,
   Filter,
+  Eye,
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { AGENT_TARGET_LIST, getAdapter } from '@domoskills/adapters';
@@ -31,6 +32,7 @@ function ExploreContent() {
   const [selectedTrust, setSelectedTrust] = useState<TrustLevel | 'all'>('all');
   const [selectedLicense, setSelectedLicense] = useState<License | 'all'>('all');
   const [hasScriptsOnly, setHasScriptsOnly] = useState<boolean | undefined>(undefined);
+  const [visualPreviewOnly, setVisualPreviewOnly] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<'trending' | 'installs' | 'favorites' | 'updated' | 'alphabetical'>('trending');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
@@ -40,7 +42,7 @@ function ExploreContent() {
 
   // Query registry
   const searchResults = useMemo(() => {
-    return registry.getSkills({
+    const res = registry.getSkills({
       query,
       category: selectedCategory,
       agent: selectedAgent,
@@ -50,7 +52,16 @@ function ExploreContent() {
       sortBy,
       limit: 100,
     });
-  }, [query, selectedCategory, selectedAgent, selectedTrust, selectedLicense, hasScriptsOnly, sortBy]);
+    if (visualPreviewOnly) {
+      const filtered = res.skills.filter((s) => Boolean(s.previewImage));
+      return {
+        ...res,
+        skills: filtered,
+        total: filtered.length,
+      };
+    }
+    return res;
+  }, [query, selectedCategory, selectedAgent, selectedTrust, selectedLicense, hasScriptsOnly, sortBy, visualPreviewOnly]);
 
   const handleAddAllFiltered = () => {
     for (const skill of searchResults.skills) {
@@ -72,6 +83,7 @@ function ExploreContent() {
     setSelectedTrust('all');
     setSelectedLicense('all');
     setHasScriptsOnly(undefined);
+    setVisualPreviewOnly(false);
     setSortBy('trending');
   };
 
@@ -81,7 +93,8 @@ function ExploreContent() {
     selectedAgent !== 'all' ||
     selectedTrust !== 'all' ||
     selectedLicense !== 'all' ||
-    hasScriptsOnly !== undefined;
+    hasScriptsOnly !== undefined ||
+    visualPreviewOnly;
 
   return (
     <div className="min-h-screen bg-background py-10">
@@ -146,6 +159,18 @@ function ExploreContent() {
             }`}
           >
             All Domains ({registry.getAllSkills().length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setVisualPreviewOnly(!visualPreviewOnly)}
+            className={`px-3 py-1.5 rounded border whitespace-nowrap transition flex items-center gap-1.5 ${
+              visualPreviewOnly
+                ? 'border-emerald-400 bg-emerald-950/60 text-emerald-300 font-bold'
+                : 'border-border bg-surface text-text-secondary hover:text-white hover:border-border-bright'
+            }`}
+          >
+            <Eye className="h-3.5 w-3.5 text-emerald-400" />
+            <span>UI Website Previews ({registry.getAllSkills().filter((s) => Boolean(s.previewImage)).length})</span>
           </button>
           {categories.map((cat) => {
             const count = registry.getAllSkills().filter((s) => s.category === cat.slug).length;

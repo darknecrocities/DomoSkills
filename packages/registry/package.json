@@ -17,6 +17,7 @@
     "@domoskills/validators": "workspace:*"
   },
   "devDependencies": {
+    "@types/node": "^20.17.19",
     "typescript": "^5.8.2",
     "vitest": "^3.0.7"
   }

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Plus, Check, Star, Shield, ShieldCheck, AlertTriangle, ArrowUpRight, FileCode } from 'lucide-react';
+import { Plus, Check, Star, Shield, ShieldCheck, AlertTriangle, ArrowUpRight, FileCode, Eye } from 'lucide-react';
 import { Skill } from '@domoskills/validators';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -74,6 +74,23 @@ export function SkillCard({ skill }: SkillCardProps) {
           </div>
           <div>{getTrustBadge()}</div>
         </div>
+
+        {/* Visual Preview Image (for UI & Design Skills) */}
+        {skill.previewImage && (
+          <Link href={`/skills/${skill.slug}`} className="block relative mb-3 overflow-hidden rounded-lg border border-border bg-black/60 group/preview aspect-video">
+            <img
+              src={skill.previewImage}
+              alt={`${skill.name} website preview`}
+              className="w-full h-full object-cover object-top transition duration-500 group-hover/preview:scale-105"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 group-hover/preview:opacity-30 transition" />
+            <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded bg-black/80 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono text-white border border-white/10">
+              <Eye className="h-3 w-3 text-emerald-400" />
+              Website Design Preview
+            </span>
+          </Link>
+        )}
 
         {/* Skill Title */}
         <Link href={`/skills/${skill.slug}`} className="block focus:outline-none">
