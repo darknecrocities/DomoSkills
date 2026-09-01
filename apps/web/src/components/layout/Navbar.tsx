@@ -61,6 +61,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
                 <Link
                   key={link.href}
                   href={link.href}
+                  prefetch={true}
                   className={`px-3 py-1.5 font-mono text-xs font-medium uppercase tracking-wider transition rounded ${
                     isActive
                       ? 'bg-surface-active text-white border border-border-bright'
@@ -219,6 +220,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={true}
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-3 py-2 uppercase tracking-wider text-text-secondary hover:bg-surface hover:text-white rounded"
               >

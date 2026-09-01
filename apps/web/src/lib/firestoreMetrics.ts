@@ -8,6 +8,8 @@ import {
   onSnapshot,
   increment,
   serverTimestamp,
+  collection,
+  getCountFromServer,
 } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '@/lib/firebase';
 import { registry } from '@domoskills/registry';
@@ -19,11 +21,11 @@ export interface TelemetryStats {
   updatedAt?: any;
 }
 
-// Initial baseline metrics from registry
-const BASELINE_STATS = {
-  totalVisits: 14820,
-  registeredUsers: 1420,
-  totalInstalls: 486200,
+// True real starting baseline (0 artificial metrics)
+const REAL_BASELINE_STATS: TelemetryStats = {
+  totalVisits: 1,
+  registeredUsers: 0,
+  totalInstalls: 0,
 };
 
 const STATS_DOC_REF = 'stats';
@@ -39,8 +41,8 @@ export async function recordVisit(): Promise<void> {
   const hasVisitedThisSession = sessionStorage.getItem(sessionKey);
 
   // Update local counter
-  const localVisits = parseInt(localStorage.getItem('domoskills_local_visits') || '0', 10) + 1;
-  localStorage.setItem('domoskills_local_visits', localVisits.toString());
+  const localVisits = parseInt(localStorage.getItem('domoskills_real_visits') || '0', 10) + (hasVisitedThisSession ? 0 : 1);
+  localStorage.setItem('domoskills_real_visits', localVisits.toString());
 
   if (hasVisitedThisSession) {
     return;
@@ -63,7 +65,7 @@ export async function recordVisit(): Promise<void> {
       { merge: true }
     );
   } catch (error) {
-    console.warn('Firestore visit tracking skipped (offline/demo):', error);
+    // offline/demo fallback
   }
 }
 
@@ -79,15 +81,14 @@ export async function recordUserRegistration(user: {
   if (!user || !user.uid) return;
 
   // Track locally
-  const localRegCount = parseInt(localStorage.getItem('domoskills_local_registered') || '0', 10) + 1;
-  localStorage.setItem('domoskills_local_registered', localRegCount.toString());
+  const localRegCount = parseInt(localStorage.getItem('domoskills_real_registered') || '0', 10) + 1;
+  localStorage.setItem('domoskills_real_registered', localRegCount.toString());
 
   if (!isFirebaseConfigured) return;
 
   try {
     const userDocRef = doc(db, 'users', user.uid);
     const existing = await getDoc(userDocRef);
-
     const isNew = !existing.exists();
 
     await setDoc(
@@ -115,7 +116,7 @@ export async function recordUserRegistration(user: {
       );
     }
   } catch (error) {
-    console.warn('Firestore user registration record skipped:', error);
+    // ignore
   }
 }
 
@@ -123,11 +124,10 @@ export async function recordUserRegistration(user: {
  * Record skill download or CLI install event in Firestore
  */
 export async function recordDownload(skillSlug?: string, count: number = 1): Promise<void> {
-  // Track locally
-  const localInstalls = parseInt(localStorage.getItem('domoskills_local_installs') || '0', 10) + count;
-  localStorage.setItem('domoskills_local_installs', localInstalls.toString());
+  // Track real installs locally
+  const localInstalls = parseInt(localStorage.getItem('domoskills_real_installs') || '0', 10) + count;
+  localStorage.setItem('domoskills_real_installs', localInstalls.toString());
 
-  // Broadcast custom event so active UI components can react immediately
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('domoskills-install-recorded', { detail: { skillSlug, count } }));
   }
@@ -158,35 +158,48 @@ export async function recordDownload(skillSlug?: string, count: number = 1): Pro
       );
     }
   } catch (error) {
-    console.warn('Firestore download event skipped:', error);
+    // ignore
   }
+}
+
+/**
+ * Format real number with compact notation only if > 1000
+ */
+function formatMetric(num: number): string {
+  if (num >= 1_000_000) {
+    return `${(num / 1_000_000).toFixed(1)}M`;
+  }
+  if (num >= 10_000) {
+    return `${(num / 1000).toFixed(1)}k`;
+  }
+  return num.toLocaleString();
 }
 
 /**
  * React Hook: Realtime Firestore Telemetry & Global Metrics
  */
 export function useLiveTelemetry() {
-  const [stats, setStats] = useState<TelemetryStats>(BASELINE_STATS);
+  const [stats, setStats] = useState<TelemetryStats>(REAL_BASELINE_STATS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Read local storage on client mount
+    // Record page visit on initial load
+    recordVisit();
+
+    // Read real metrics from local storage
     try {
-      const localVisits = parseInt(localStorage.getItem('domoskills_local_visits') || '0', 10);
-      const localReg = parseInt(localStorage.getItem('domoskills_local_registered') || '0', 10);
-      const localInstalls = parseInt(localStorage.getItem('domoskills_local_installs') || '0', 10);
+      const localVisits = parseInt(localStorage.getItem('domoskills_real_visits') || '1', 10);
+      const localReg = parseInt(localStorage.getItem('domoskills_real_registered') || '0', 10);
+      const localInstalls = parseInt(localStorage.getItem('domoskills_real_installs') || '0', 10);
 
       setStats({
-        totalVisits: BASELINE_STATS.totalVisits + localVisits,
-        registeredUsers: BASELINE_STATS.registeredUsers + localReg,
-        totalInstalls: BASELINE_STATS.totalInstalls + localInstalls,
+        totalVisits: Math.max(1, localVisits),
+        registeredUsers: localReg,
+        totalInstalls: localInstalls,
       });
     } catch {
       // ignore
     }
-
-    // Record page visit on initial load
-    recordVisit();
 
     if (!isFirebaseConfigured) {
       setLoading(false);
@@ -195,36 +208,48 @@ export function useLiveTelemetry() {
 
     try {
       const statsRef = doc(db, STATS_COLLECTION, STATS_DOC_REF);
+
+      // Real-time listener on telemetry stats document
       const unsubscribe = onSnapshot(
         statsRef,
         (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
             setStats({
-              totalVisits: (data.totalVisits || BASELINE_STATS.totalVisits),
-              registeredUsers: (data.registeredUsers || BASELINE_STATS.registeredUsers),
-              totalInstalls: (data.totalInstalls || BASELINE_STATS.totalInstalls),
+              totalVisits: typeof data.totalVisits === 'number' ? data.totalVisits : 1,
+              registeredUsers: typeof data.registeredUsers === 'number' ? data.registeredUsers : 0,
+              totalInstalls: typeof data.totalInstalls === 'number' ? data.totalInstalls : 0,
               updatedAt: data.updatedAt,
             });
-          } else {
-            // Seed initial stats document in Firestore
-            setDoc(statsRef, BASELINE_STATS, { merge: true }).catch(() => {});
           }
           setLoading(false);
         },
-        (error) => {
-          console.warn('Firestore telemetry snapshot subscription fallback:', error);
+        () => {
           setLoading(false);
         }
       );
 
+      // Also query actual users collection count for ground truth
+      const usersCollection = collection(db, 'users');
+      getCountFromServer(usersCollection)
+        .then((userCountSnap) => {
+          const actualCount = userCountSnap.data().count;
+          if (actualCount > 0) {
+            setStats((prev) => ({
+              ...prev,
+              registeredUsers: Math.max(prev.registeredUsers, actualCount),
+            }));
+          }
+        })
+        .catch(() => {});
+
       return () => unsubscribe();
-    } catch (e) {
+    } catch {
       setLoading(false);
     }
   }, []);
 
-  // Listen to local install events for instant responsive counter updates
+  // Instant local listener for install actions
   useEffect(() => {
     const handleInstallEvent = (e: any) => {
       const added = e.detail?.count || 1;
@@ -241,8 +266,8 @@ export function useLiveTelemetry() {
   return {
     ...stats,
     loading,
-    formattedVisits: stats.totalVisits >= 1000 ? `${(stats.totalVisits / 1000).toFixed(1)}k` : stats.totalVisits.toLocaleString(),
-    formattedUsers: stats.registeredUsers.toLocaleString(),
-    formattedInstalls: stats.totalInstalls >= 1000 ? `${(stats.totalInstalls / 1000).toFixed(0)}k+` : stats.totalInstalls.toLocaleString(),
+    formattedVisits: formatMetric(stats.totalVisits),
+    formattedUsers: formatMetric(stats.registeredUsers),
+    formattedInstalls: formatMetric(stats.totalInstalls),
   };
 }
