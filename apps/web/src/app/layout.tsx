@@ -47,6 +47,16 @@ export const metadata: Metadata = {
     title: 'DomoSkills — The Open Agent Skills Marketplace',
     description: 'Discover and install modular open-source skills for AI coding agents in one command.',
     type: 'website',
+    images: ['/assets/domodomo/domodomo-app-icon.png'],
+  },
+  icons: {
+    icon: [
+      { url: '/assets/domodomo/domodomo-app-icon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/assets/domodomo/domodomo-app-icon.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon.png', sizes: 'any' },
+    ],
+    shortcut: '/assets/domodomo/domodomo-app-icon.png',
+    apple: '/assets/domodomo/domodomo-app-icon.png',
   },
 };
 

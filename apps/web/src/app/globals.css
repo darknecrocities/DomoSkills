@@ -96,30 +96,50 @@
   position: relative;
   overflow: hidden;
   z-index: 10;
-  background-color: #0d0d0d;
+  background-color: rgba(13, 13, 13, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.35s ease;
 }
 
 .card-polkadot-hover::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1.5px, transparent 1.5px);
-  background-size: 16px 16px;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.3) 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
   background-position: center center;
   opacity: 0;
-  transform: scale(0.8);
-  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(0.92);
+  transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
   z-index: 1; /* Behind card content */
   border-radius: inherit;
-  mask-image: radial-gradient(circle at center, black 30%, transparent 95%);
-  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 95%);
+  mask-image: radial-gradient(220px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, rgba(0, 0, 0, 0.65) 50%, transparent 100%);
+  -webkit-mask-image: radial-gradient(220px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, rgba(0, 0, 0, 0.65) 50%, transparent 100%);
+}
+
+.card-polkadot-hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(260px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.05), transparent 75%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
 }
 
 .card-polkadot-hover:hover::before {
   opacity: 1;
-  transform: scale(1.22); /* Smooth zoom-in / pinch-out feel */
+  transform: scale(1.08); /* Smooth zoom-in / pulling towards you feel */
+}
+
+.card-polkadot-hover:hover::after {
+  opacity: 1;
 }
 
 .card-polkadot-hover > * {

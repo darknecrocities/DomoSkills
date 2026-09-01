@@ -5,6 +5,7 @@ import { X, Copy, Check, ShieldCheck, Download, Terminal, FolderTree, ArrowRight
 import { useCartStore } from '@/store/useCartStore';
 import { AGENT_TARGET_LIST, getAdapter, generateInstallCommand, generateMultiLineInstallCommand } from '@domoskills/adapters';
 import { AgentTarget } from '@domoskills/validators';
+import { recordDownload } from '@/lib/firestoreMetrics';
 
 export function InstallModal() {
   const {
@@ -39,14 +40,15 @@ export function InstallModal() {
     null,
     2
   );
-
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
+    recordDownload(undefined, Math.max(1, skills.length));
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownloadJson = () => {
+    recordDownload(undefined, Math.max(1, skills.length));
     const blob = new Blob([configJsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

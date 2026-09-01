@@ -70,7 +70,7 @@ capabilities:
   };
 
   return (
-    <div className="min-h-screen bg-background py-12">
+    <div className="min-h-screen bg-transparent py-12">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Header */}

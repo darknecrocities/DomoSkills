@@ -6,6 +6,7 @@ import { X, Trash2, Copy, Check, Terminal, Download, ArrowRight, Layers, FileCod
 import { useCartStore } from '@/store/useCartStore';
 import { AGENT_TARGET_LIST, getAdapter, generateInstallCommand } from '@domoskills/adapters';
 import { AgentTarget } from '@domoskills/validators';
+import { recordDownload } from '@/lib/firestoreMetrics';
 
 export function SkillCartDrawer() {
   const {
@@ -31,10 +32,12 @@ export function SkillCartDrawer() {
   const handleCopy = () => {
     navigator.clipboard.writeText(installCmd);
     setCopied(true);
+    recordDownload(undefined, Math.max(1, skills.length));
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownloadConfig = () => {
+    recordDownload(undefined, Math.max(1, skills.length));
     const configPayload = {
       version: 1,
       agent: targetAgent,

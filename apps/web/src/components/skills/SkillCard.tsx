@@ -87,7 +87,7 @@ export function SkillCard({ skill }: SkillCardProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 group-hover/preview:opacity-30 transition" />
             <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded bg-black/80 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono text-white border border-white/10">
               <Eye className="h-3 w-3 text-emerald-400" />
-              Website Design Preview
+              UI Design Preview
             </span>
           </Link>
         )}

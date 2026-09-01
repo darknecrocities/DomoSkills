@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, ShoppingBag, Menu, X, Github, User, LogOut, Sparkles, Layers, ChevronDown } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, Github, User, LogOut, Sparkles, Layers, ChevronDown, Star } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuth } from '@/context/AuthContext';
+import { useGitHubStars } from '@/lib/useGitHubStars';
 
 interface NavbarProps {
   onOpenCommandPalette?: () => void;
@@ -13,12 +14,19 @@ interface NavbarProps {
 
 export function Navbar({ onOpenCommandPalette }: NavbarProps) {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
   const { skills, isDrawerOpen, setDrawerOpen } = useCartStore();
   const { user, openAuthModal, logout } = useAuth();
+  const { formattedStars } = useGitHubStars();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
-  const cartCount = skills.length;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const cartCount = mounted ? skills.length : 0;
+  const currentUser = mounted ? user : null;
 
   const navLinks = [
     { href: '/explore', label: 'Explore Skills' },
@@ -92,17 +100,19 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
             <Search className="h-4 w-4" />
           </button>
 
-          {/* GitHub Star Link */}
+          {/* GitHub Star Link with Dynamic Star Count */}
           <a
             href="https://github.com/darknecrocities/DomoSkills"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden lg:flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-1.5 font-mono text-xs text-white transition hover:border-white hover:bg-surface-raised group"
+            className="hidden lg:flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-1.5 font-mono text-xs text-white transition hover:border-white hover:bg-surface-raised group shadow-sm"
+            title="Star DomoSkills on GitHub"
           >
             <Github className="h-3.5 w-3.5 text-text-secondary group-hover:text-white" />
             <span className="font-semibold">Star</span>
-            <span className="rounded bg-white/10 px-1.5 py-0.2 text-[10px] text-text-muted group-hover:text-white">
-              GitHub
+            <span className="inline-flex items-center gap-1 rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-bold text-white group-hover:bg-white/20 transition">
+              <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+              <span suppressHydrationWarning>{formattedStars}</span>
             </span>
           </a>
 
@@ -126,21 +136,21 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
           </button>
 
           {/* User Auth Section */}
-          {user ? (
+          {currentUser ? (
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="flex items-center gap-2 rounded-xl border border-border bg-surface-raised px-2.5 py-1.5 font-mono text-xs text-white hover:border-white transition"
               >
-                {user.photoURL ? (
-                  <img src={user.photoURL} alt={user.displayName || 'User'} className="h-5 w-5 rounded-full object-cover" />
+                {currentUser.photoURL ? (
+                  <img src={currentUser.photoURL} alt={currentUser.displayName || 'User'} className="h-5 w-5 rounded-full object-cover" />
                 ) : (
                   <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-black font-bold text-[10px]">
-                    {user.displayName?.charAt(0).toUpperCase() || 'U'}
+                    {currentUser.displayName?.charAt(0).toUpperCase() || 'U'}
                   </div>
                 )}
-                <span className="hidden sm:inline font-bold">{user.displayName || 'Developer'}</span>
+                <span className="hidden sm:inline font-bold">{currentUser.displayName || 'Developer'}</span>
                 <ChevronDown className="h-3 w-3 text-text-muted" />
               </button>
 
@@ -151,7 +161,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
                 >
                   <div className="px-3 py-2 border-b border-border/80 text-text-muted text-[11px]">
                     Signed in as <br />
-                    <span className="text-white font-bold truncate block">{user.email}</span>
+                    <span className="text-white font-bold truncate block">{currentUser.email}</span>
                   </div>
                   <Link
                     href="/explore"
@@ -215,7 +225,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
                 {link.label}
               </Link>
             ))}
-            {!user ? (
+            {!currentUser ? (
               <button
                 type="button"
                 onClick={() => {
@@ -237,7 +247,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
                 className="flex items-center gap-2 px-3 py-2 text-left uppercase tracking-wider text-red-400 hover:bg-surface rounded font-bold"
               >
                 <LogOut className="h-4 w-4" />
-                <span>Log Out ({user.displayName})</span>
+                <span>Log Out ({currentUser.displayName})</span>
               </button>
             )}
             <a

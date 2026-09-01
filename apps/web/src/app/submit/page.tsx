@@ -258,7 +258,7 @@ ${builderInstructions}
   const categories = registry.getCategories();
 
   return (
-    <div className="min-h-screen bg-background py-12 tech-grid-bg relative">
+    <div className="min-h-screen bg-transparent py-12 tech-grid-bg relative">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Header with Mascot */}

@@ -27,6 +27,8 @@ import { InteractiveTerminal } from '@/components/terminal/InteractiveTerminal';
 import { SkillCard } from '@/components/skills/SkillCard';
 import { DomoMascot } from '@/components/mascot/DomoMascot';
 import { AgentBeltCarousel } from '@/components/brands/AgentBeltCarousel';
+import { useLiveTelemetry } from '@/lib/firestoreMetrics';
+import { useGitHubStars } from '@/lib/useGitHubStars';
 
 const CYCLING_WORDS = ['Frontend & React', 'OWASP Security', 'AI & RAG Agents', 'Cloud & Edge', 'DevOps & K8s', 'Clean Architecture'];
 const TYPEWRITER_PHRASES = [
@@ -40,6 +42,8 @@ export default function HomePage() {
   const router = useRouter();
   const [wordIndex, setWordIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const { formattedVisits, formattedUsers, formattedInstalls } = useLiveTelemetry();
+  const { formattedStars } = useGitHubStars();
 
   // Typewriter loop state (~5s cycle)
   const [typewriterText, setTypewriterText] = useState('');
@@ -172,15 +176,18 @@ export default function HomePage() {
                   <span>Create / Submit Skill</span>
                 </Link>
 
-                <div className="hidden sm:flex items-center gap-4 text-text-muted pl-4 border-l border-border font-mono text-xs">
-                  <div>
+                <div className="hidden sm:flex flex-wrap items-center gap-4 text-text-muted pl-4 border-l border-border font-mono text-xs">
+                  <div title="Total indexed capabilities in registry">
                     <span className="text-white font-bold">{stats.totalSkills}</span> Skills
                   </div>
-                  <div>
-                    <span className="text-white font-bold">{(stats.totalInstalls / 1000).toFixed(0)}k+</span> Installs
+                  <div title="Total skill installations / CLI downloads recorded in Firestore">
+                    <span suppressHydrationWarning className="text-white font-bold">{formattedInstalls}</span> Downloads
                   </div>
-                  <div>
-                    <span className="text-white font-bold">{stats.totalRepositories}</span> Repositories
+                  <div title="Total registered developers synced with Firestore">
+                    <span suppressHydrationWarning className="text-white font-bold">{formattedUsers}</span> Registered
+                  </div>
+                  <div title="Total site visits counter recorded in Firestore">
+                    <span suppressHydrationWarning className="text-white font-bold">{formattedVisits}</span> Visits
                   </div>
                 </div>
               </div>
@@ -205,7 +212,7 @@ export default function HomePage() {
       {/* ========================================================================= */}
       {/* 3. EXPLORE BY DOMAIN */}
       {/* ========================================================================= */}
-      <section className="border-b border-border py-20 bg-background">
+      <section className="border-b border-border py-20 bg-transparent">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
@@ -258,7 +265,7 @@ export default function HomePage() {
       {/* ========================================================================= */}
       {/* 4. TRENDING SKILLS */}
       {/* ========================================================================= */}
-      <section className="border-b border-border py-20 bg-surface-raised tech-grid-bg">
+      <section className="border-b border-border py-20 bg-transparent tech-grid-bg">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
@@ -292,7 +299,7 @@ export default function HomePage() {
       {/* ========================================================================= */}
       {/* 5. HOW IT WORKS (01 FIND -> 02 STACK -> 03 INSTALL -> 04 BUILD) */}
       {/* ========================================================================= */}
-      <section className="border-b border-border py-20 bg-background">
+      <section className="border-b border-border py-20 bg-transparent">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
@@ -349,7 +356,7 @@ export default function HomePage() {
       {/* ========================================================================= */}
       {/* 6. MULTI-AGENT COMPATIBILITY */}
       {/* ========================================================================= */}
-      <section className="border-b border-border py-20 bg-surface">
+      <section className="border-b border-border py-20 bg-transparent">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           
           <div className="max-w-2xl mb-12 space-y-2">
@@ -397,7 +404,7 @@ export default function HomePage() {
       {/* ========================================================================= */}
       {/* 7. OPEN SOURCE MANIFESTO & MASCOT SHOWCASE */}
       {/* ========================================================================= */}
-      <section className="py-24 bg-background tech-grid-bg border-t border-border">
+      <section className="py-24 bg-transparent tech-grid-bg border-t border-border">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           
           <div className="card-polkadot-hover rounded-2xl border border-border bg-surface p-8 sm:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-10">
@@ -431,6 +438,26 @@ export default function HomePage() {
                 >
                   Publish a Skill
                 </Link>
+                <a
+                  href="https://github.com/darknecrocities/DomoSkills"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded border border-border bg-surface-raised px-3.5 py-2.5 font-mono text-xs text-text-secondary hover:text-white hover:border-white transition"
+                >
+                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                  <span>★ {formattedStars} Stars on GitHub</span>
+                </a>
+              </div>
+
+              {/* Live Firestore Telemetry Footnote */}
+              <div className="pt-3 border-t border-border/60 flex flex-wrap items-center gap-4 text-[11px] font-mono text-text-muted">
+                <div className="flex items-center gap-1.5 text-emerald-400">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="font-bold">Firestore Telemetry Sync: Online</span>
+                </div>
+                <div>• {formattedUsers} Developers</div>
+                <div>• {formattedInstalls} Installs</div>
+                <div>• {formattedVisits} Visits</div>
               </div>
             </div>
 

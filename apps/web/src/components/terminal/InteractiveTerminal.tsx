@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Copy, Check, Terminal as TerminalIcon, Sparkles } from 'lucide-react';
 import { registry } from '@domoskills/registry';
+import { recordDownload } from '@/lib/firestoreMetrics';
 
 interface TerminalProps {
   initialCommand?: string;
@@ -47,6 +48,7 @@ export function InteractiveTerminal({
   const handleCopy = () => {
     navigator.clipboard.writeText(initialCommand);
     setCopied(true);
+    recordDownload('react-performance', 2);
     setTimeout(() => setCopied(false), 2000);
   };
 

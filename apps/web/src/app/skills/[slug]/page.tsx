@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -28,6 +28,7 @@ import { AGENT_TARGET_LIST, getAdapter, generateInstallCommand } from '@domoskil
 import { AgentTarget } from '@domoskills/validators';
 import { useCartStore } from '@/store/useCartStore';
 import { FileTreeViewer } from '@/components/skills/FileTreeViewer';
+import { recordDownload } from '@/lib/firestoreMetrics';
 
 export default function SkillDetailPage() {
   const params = useParams();
@@ -38,20 +39,27 @@ export default function SkillDetailPage() {
     notFound();
   }
 
+  const [mounted, setMounted] = useState(false);
   const { targetAgent, hasSkill, toggleSkill, setTargetAgent } = useCartStore();
-  const isSelected = hasSkill(skill.slug);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const activeAgent = mounted ? targetAgent : 'universal';
+  const isSelected = mounted ? hasSkill(skill.slug) : false;
   const [copied, setCopied] = useState(false);
   const [promptCopied, setPromptCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'preview' | 'instructions' | 'files' | 'attribution' | 'compatibility'>(
     skill.previewImage ? 'preview' : 'instructions'
   );
-
-  const adapter = getAdapter(targetAgent);
-  const installCmd = generateInstallCommand([skill.slug], targetAgent);
+  const adapter = getAdapter(activeAgent);
+  const installCmd = generateInstallCommand([skill.slug], activeAgent);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(installCmd);
     setCopied(true);
+    recordDownload(skill.slug, 1);
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -62,7 +70,7 @@ export default function SkillDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-10">
+    <div className="min-h-screen bg-transparent py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Back Link */}
@@ -127,9 +135,10 @@ export default function SkillDetailPage() {
                 <div className="flex items-center justify-between text-text-muted mb-1 text-[11px]">
                   <span>Install for:</span>
                   <select
-                    value={targetAgent}
+                    value={activeAgent}
                     onChange={(e) => setTargetAgent(e.target.value as AgentTarget)}
                     className="bg-surface border border-border rounded px-1.5 py-0.5 text-white text-[11px] focus:outline-none"
+                    suppressHydrationWarning
                   >
                     {AGENT_TARGET_LIST.map((t) => (
                       <option key={t} value={t}>
@@ -140,7 +149,7 @@ export default function SkillDetailPage() {
                 </div>
 
                 <div className="rounded border border-border bg-black p-3 font-mono text-xs text-white break-all flex items-center justify-between gap-2">
-                  <span className="text-[11px]">{installCmd}</span>
+                  <span suppressHydrationWarning className="text-[11px]">{installCmd}</span>
                   <button
                     type="button"
                     onClick={handleCopy}

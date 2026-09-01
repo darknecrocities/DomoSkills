@@ -97,7 +97,7 @@ function ExploreContent() {
     visualPreviewOnly;
 
   return (
-    <div className="min-h-screen bg-background py-10">
+    <div className="min-h-screen bg-transparent py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Page Title & Search Header */}
@@ -170,7 +170,7 @@ function ExploreContent() {
             }`}
           >
             <Eye className="h-3.5 w-3.5 text-emerald-400" />
-            <span>UI Website Previews ({registry.getAllSkills().filter((s) => Boolean(s.previewImage)).length})</span>
+            <span>UI Design Previews ({registry.getAllSkills().filter((s) => Boolean(s.previewImage)).length})</span>
           </button>
           {categories.map((cat) => {
             const count = registry.getAllSkills().filter((s) => s.category === cat.slug).length;

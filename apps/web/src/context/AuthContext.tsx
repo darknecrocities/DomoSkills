@@ -11,6 +11,7 @@ import {
   User as FirebaseUser,
 } from 'firebase/auth';
 import { auth, googleProvider, githubProvider, isFirebaseConfigured } from '@/lib/firebase';
+import { recordUserRegistration } from '@/lib/firestoreMetrics';
 
 export interface AppUser {
   uid: string;
@@ -60,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const unsubscribe = onAuthStateChanged(auth, (fbUser: FirebaseUser | null) => {
       if (fbUser) {
-        setUser({
+        const loggedUser: AppUser = {
           uid: fbUser.uid,
           email: fbUser.email,
           displayName: fbUser.displayName || fbUser.email?.split('@')[0] || 'Developer',
@@ -70,7 +71,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             : fbUser.providerData[0]?.providerId.includes('google')
             ? 'google'
             : 'email') as AppUser['provider'],
-        });
+        };
+        setUser(loggedUser);
+        recordUserRegistration(loggedUser);
       } else {
         setUser(null);
       }
@@ -100,19 +103,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
       setUser(demoUser);
       localStorage.setItem('domoskills_demo_user', JSON.stringify(demoUser));
+      recordUserRegistration(demoUser);
       closeAuthModal();
       return;
     }
 
     try {
       const res = await signInWithPopup(auth, googleProvider);
-      setUser({
+      const appUser: AppUser = {
         uid: res.user.uid,
         email: res.user.email,
         displayName: res.user.displayName,
         photoURL: res.user.photoURL,
         provider: 'google',
-      });
+      };
+      setUser(appUser);
+      recordUserRegistration(appUser);
       closeAuthModal();
     } catch (err: any) {
       console.error('Google Sign In failed:', err);
@@ -131,19 +137,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
       setUser(demoUser);
       localStorage.setItem('domoskills_demo_user', JSON.stringify(demoUser));
+      recordUserRegistration(demoUser);
       closeAuthModal();
       return;
     }
 
     try {
       const res = await signInWithPopup(auth, githubProvider);
-      setUser({
+      const appUser: AppUser = {
         uid: res.user.uid,
         email: res.user.email,
         displayName: res.user.displayName,
         photoURL: res.user.photoURL,
         provider: 'github',
-      });
+      };
+      setUser(appUser);
+      recordUserRegistration(appUser);
       closeAuthModal();
     } catch (err: any) {
       console.error('GitHub Sign In failed:', err);
@@ -162,19 +171,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
       setUser(demoUser);
       localStorage.setItem('domoskills_demo_user', JSON.stringify(demoUser));
+      recordUserRegistration(demoUser);
       closeAuthModal();
       return;
     }
 
     try {
       const res = await signInWithEmailAndPassword(auth, email, pass);
-      setUser({
+      const appUser: AppUser = {
         uid: res.user.uid,
         email: res.user.email,
         displayName: res.user.displayName,
         photoURL: res.user.photoURL,
         provider: 'email',
-      });
+      };
+      setUser(appUser);
+      recordUserRegistration(appUser);
       closeAuthModal();
     } catch (err: any) {
       console.error('Email sign in failed:', err);
@@ -193,6 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
       setUser(demoUser);
       localStorage.setItem('domoskills_demo_user', JSON.stringify(demoUser));
+      recordUserRegistration(demoUser);
       closeAuthModal();
       return;
     }
@@ -202,13 +215,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (name) {
         await updateProfile(res.user, { displayName: name });
       }
-      setUser({
+      const appUser: AppUser = {
         uid: res.user.uid,
         email: res.user.email,
         displayName: name || res.user.displayName,
         photoURL: res.user.photoURL,
         provider: 'email',
-      });
+      };
+      setUser(appUser);
+      recordUserRegistration(appUser);
       closeAuthModal();
     } catch (err: any) {
       console.error('Email sign up failed:', err);

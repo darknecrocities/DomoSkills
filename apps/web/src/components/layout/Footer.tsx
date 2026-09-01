@@ -1,8 +1,15 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
-import { Terminal, Shield, Cpu, Code2, Github, ExternalLink } from 'lucide-react';
+import { Terminal, Shield, Cpu, Code2, Github, ExternalLink, Star } from 'lucide-react';
+import { useGitHubStars } from '@/lib/useGitHubStars';
+import { useLiveTelemetry } from '@/lib/firestoreMetrics';
 
 export function Footer() {
+  const { formattedStars } = useGitHubStars();
+  const { formattedVisits, formattedUsers, formattedInstalls } = useLiveTelemetry();
+
   return (
     <footer className="border-t border-border bg-background pt-16 pb-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -28,9 +35,20 @@ export function Footer() {
               The free, open-source capability registry and discovery marketplace for AI coding agents.
               Discover modular skills, stack capabilities, and install directly into your project in seconds.
             </p>
-            <div className="inline-flex items-center gap-2 rounded border border-border bg-surface px-3 py-1.5 font-mono text-xs text-text-muted">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>Open Community Registry • Verified Open-Source Skills</span>
+            <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-text-muted">
+              <div className="inline-flex items-center gap-2 rounded border border-border bg-surface px-3 py-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Firestore Live Sync: Online</span>
+              </div>
+              <a
+                href="https://github.com/darknecrocities/DomoSkills"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-1.5 text-text-secondary hover:text-white hover:border-white transition"
+              >
+                <Github className="h-3.5 w-3.5 text-text-secondary" />
+                <span suppressHydrationWarning>★ {formattedStars} Stars</span>
+              </a>
             </div>
           </div>
 
