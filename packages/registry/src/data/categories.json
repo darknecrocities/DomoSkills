@@ -1,0 +1,98 @@
+[
+  {
+    "id": "cat-frontend",
+    "slug": "frontend",
+    "name": "Frontend",
+    "description": "React, Next.js, Vue, Svelte, Tailwind, and client-side UI optimization",
+    "icon": "Layout",
+    "order": 1
+  },
+  {
+    "id": "cat-design",
+    "slug": "design",
+    "name": "UI / UX / Design",
+    "description": "Design systems, tokens, micro-interactions, motion, and accessibility",
+    "icon": "Palette",
+    "order": 2
+  },
+  {
+    "id": "cat-backend",
+    "slug": "backend",
+    "name": "Backend",
+    "description": "Node.js, FastAPI, Go, GraphQL, REST APIs, and microservices architecture",
+    "icon": "Server",
+    "order": 3
+  },
+  {
+    "id": "cat-fullstack",
+    "slug": "fullstack",
+    "name": "Fullstack",
+    "description": "End-to-end fullstack patterns, monorepos, and server-client state management",
+    "icon": "Layers",
+    "order": 4
+  },
+  {
+    "id": "cat-security",
+    "slug": "security",
+    "name": "Security",
+    "description": "OWASP standards, threat modeling, dependency auditing, and secrets hardening",
+    "icon": "ShieldCheck",
+    "order": 5
+  },
+  {
+    "id": "cat-devops",
+    "slug": "devops",
+    "name": "DevOps",
+    "description": "Docker containerization, Kubernetes, CI/CD pipelines, and infrastructure as code",
+    "icon": "TerminalSquare",
+    "order": 6
+  },
+  {
+    "id": "cat-cloud",
+    "slug": "cloud",
+    "name": "Cloud",
+    "description": "AWS, GCP, Azure, Terraform, serverless architecture, and observability",
+    "icon": "Cloud",
+    "order": 7
+  },
+  {
+    "id": "cat-ai-ml",
+    "slug": "ai-ml",
+    "name": "AI / ML",
+    "description": "RAG pipelines, LLM agent tool use, prompt evaluation, and vector retrieval",
+    "icon": "Cpu",
+    "order": 8
+  },
+  {
+    "id": "cat-database",
+    "slug": "database",
+    "name": "Database",
+    "description": "PostgreSQL, MySQL, Redis, index optimization, query tuning, and migrations",
+    "icon": "Database",
+    "order": 9
+  },
+  {
+    "id": "cat-testing",
+    "slug": "testing",
+    "name": "Testing",
+    "description": "Playwright E2E, Vitest unit testing, Cypress, and test-driven development",
+    "icon": "CheckCircle2",
+    "order": 10
+  },
+  {
+    "id": "cat-mobile",
+    "slug": "mobile",
+    "name": "Mobile",
+    "description": "React Native, Expo, Flutter, iOS Swift, and Android modern architectures",
+    "icon": "Smartphone",
+    "order": 11
+  },
+  {
+    "id": "cat-productivity",
+    "slug": "productivity",
+    "name": "Productivity",
+    "description": "Git workflows, automated documentation, changelogs, and developer toolchains",
+    "icon": "Sparkles",
+    "order": 12
+  }
+]
