@@ -11,8 +11,14 @@ interface SkillCardProps {
 }
 
 export function SkillCard({ skill }: SkillCardProps) {
+  const [mounted, setMounted] = React.useState(false);
   const { hasSkill, toggleSkill } = useCartStore();
-  const isSelected = hasSkill(skill.slug);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isSelected = mounted ? hasSkill(skill.slug) : false;
 
   const handleAddClick = (e: React.MouseEvent) => {
     e.preventDefault();
