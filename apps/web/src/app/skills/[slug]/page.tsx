@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   Eye,
+  Trash2,
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { AGENT_TARGET_LIST, getAdapter, generateInstallCommand } from '@domoskills/adapters';
@@ -30,6 +31,7 @@ import { useCartStore } from '@/store/useCartStore';
 import { useSkillStars } from '@/lib/useSkillStars';
 import { FileTreeViewer } from '@/components/skills/FileTreeViewer';
 import { recordDownload } from '@/lib/firestoreMetrics';
+import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
 
 export default function SkillDetailPage() {
   const params = useParams();
@@ -177,10 +179,13 @@ export default function SkillDetailPage() {
                 </div>
               </div>
 
-              {/* Add to stack button */}
+              {/* Add / Remove from stack button */}
               <button
                 type="button"
-                onClick={() =>
+                onClick={(e) => {
+                  if (!isSelected) {
+                    fireCartFlyAnimation(e.clientX, e.clientY, skill.name);
+                  }
                   toggleSkill({
                     id: skill.id,
                     slug: skill.slug,
@@ -188,18 +193,20 @@ export default function SkillDetailPage() {
                     category: skill.category,
                     license: skill.license,
                     trustLevel: skill.trustLevel,
-                  })
-                }
-                className={`w-full flex items-center justify-center gap-2 rounded border py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition ${
+                  });
+                }}
+                className={`group/btn w-full flex items-center justify-center gap-2 rounded border py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
                   isSelected
-                    ? 'border-white bg-white text-black hover:bg-muted-white shadow-sm'
-                    : 'border-white bg-surface-raised text-white hover:bg-white hover:text-black'
+                    ? 'border-border bg-surface text-white hover:border-red-500/60 hover:bg-red-500/10 hover:text-red-400'
+                    : 'border-white bg-white text-black hover:bg-muted-white shadow-sm'
                 }`}
               >
                 {isSelected ? (
                   <>
-                    <Check className="h-4 w-4" />
-                    <span>In Your Skill Stack</span>
+                    <Check className="h-4 w-4 text-emerald-400 group-hover/btn:hidden" />
+                    <Trash2 className="h-4 w-4 text-red-400 hidden group-hover/btn:inline" />
+                    <span className="group-hover/btn:hidden">In Your Skill Stack</span>
+                    <span className="hidden group-hover/btn:inline text-red-400">Remove from Stack</span>
                   </>
                 ) : (
                   <>

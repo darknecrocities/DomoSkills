@@ -7,6 +7,8 @@ interface Particle {
   id: number;
   startX: number;
   startY: number;
+  flyX: number;
+  flyY: number;
   label: string;
 }
 
@@ -22,16 +24,20 @@ export function fireCartFlyAnimation(
   skillName: string
 ) {
   if (typeof window === 'undefined') return;
+  // Fallback to center of viewport if clicked without coordinates (e.g. keyboard)
+  const safeX = originX > 0 ? originX : window.innerWidth / 2;
+  const safeY = originY > 0 ? originY : window.innerHeight / 2;
+
   window.dispatchEvent(
     new CustomEvent(CART_FLY_EVENT, {
-      detail: { originX, originY, skillName },
+      detail: { originX: safeX, originY: safeY, skillName },
     })
   );
 }
 
 /**
  * Mount this once in AppShell.
- * It listens for CART_FLY_EVENT, creates a flying particle aimed at #cart-icon,
+ * It listens for CART_FLY_EVENT, creates a flying particle aimed at #navbar-cart-btn,
  * and bounces the cart icon button on landing.
  */
 export function CartFlyAnimation() {
@@ -56,16 +62,17 @@ export function CartFlyAnimation() {
     const flyX = targetX - startX - 18;
     const flyY = targetY - startY - 18;
 
-    setParticles((prev) => [...prev, { id, startX, startY, label: skillName.slice(0, 2).toUpperCase() }]);
-
-    // Set CSS custom properties on the particle element right after mount
-    requestAnimationFrame(() => {
-      const el = document.getElementById(`cart-particle-${id}`);
-      if (el) {
-        el.style.setProperty('--fly-x', `${flyX}px`);
-        el.style.setProperty('--fly-y', `${flyY}px`);
-      }
-    });
+    setParticles((prev) => [
+      ...prev,
+      {
+        id,
+        startX,
+        startY,
+        flyX,
+        flyY,
+        label: skillName?.slice(0, 2).toUpperCase() || 'SK',
+      },
+    ]);
 
     // Bounce cart icon ~when particle lands (75% through 750ms = ~560ms)
     setTimeout(() => {
@@ -81,7 +88,7 @@ export function CartFlyAnimation() {
     // Remove particle after animation finishes
     setTimeout(() => {
       setParticles((prev) => prev.filter((p) => p.id !== id));
-    }, 820);
+    }, 850);
   }, []);
 
   useEffect(() => {
@@ -92,18 +99,25 @@ export function CartFlyAnimation() {
   if (particles.length === 0) return null;
 
   return (
-    <>
+    <div className="fixed inset-0 pointer-events-none z-[99999] overflow-hidden">
       {particles.map((p) => (
         <div
           key={p.id}
           id={`cart-particle-${p.id}`}
           className="cart-fly-particle"
-          style={{ left: p.startX, top: p.startY }}
+          style={
+            {
+              left: `${p.startX}px`,
+              top: `${p.startY}px`,
+              '--fly-x': `${p.flyX}px`,
+              '--fly-y': `${p.flyY}px`,
+            } as React.CSSProperties
+          }
           aria-hidden="true"
         >
-          <ShoppingBag style={{ width: 16, height: 16 }} />
+          <ShoppingBag style={{ width: 18, height: 18 }} />
         </div>
       ))}
-    </>
+    </div>
   );
 }

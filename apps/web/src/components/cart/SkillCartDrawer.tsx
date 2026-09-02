@@ -302,16 +302,19 @@ export function SkillCartDrawer() {
                             </div>
                           </div>
                         </div>
-                        {!isConfirmed && (
-                          <button
-                            type="button"
-                            onClick={() => removeSkill(s.slug)}
-                            className="text-text-muted hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-1 shrink-0 ml-2"
-                            title="Remove"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            removeSkill(s.slug);
+                            if (isConfirmed) setIsConfirmed(false);
+                          }}
+                          className="flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-mono text-text-muted hover:text-red-400 hover:bg-red-500/10 border border-border/50 hover:border-red-500/40 transition shrink-0 ml-2 cursor-pointer"
+                          title={`Remove ${s.name} from stack`}
+                          aria-label={`Remove ${s.name}`}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          <span className="hidden xs:inline font-semibold">Remove</span>
+                        </button>
                       </div>
                     ))}
                   </div>

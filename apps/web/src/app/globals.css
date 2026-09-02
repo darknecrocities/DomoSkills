@@ -224,35 +224,37 @@ code, pre, kbd {
 /* Flying-to-cart particle animation */
 @keyframes cart-fly {
   0% {
-    transform: translate(0, 0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
     opacity: 1;
   }
-  60% {
+  50% {
     opacity: 1;
+    transform: translate3d(calc(var(--fly-x) * 0.5), calc(var(--fly-y) * 0.45 - 24px), 0) scale(0.85);
+  }
+  85% {
+    opacity: 0.9;
+    transform: translate3d(calc(var(--fly-x) * 0.9), calc(var(--fly-y) * 0.9), 0) scale(0.5);
   }
   100% {
-    transform: translate(var(--fly-x), var(--fly-y)) scale(0.15);
+    transform: translate3d(var(--fly-x), var(--fly-y), 0) scale(0.2);
     opacity: 0;
   }
 }
 
 .cart-fly-particle {
   position: fixed;
-  z-index: 9999;
+  z-index: 99999;
   pointer-events: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #000;
-  font-size: 14px;
-  font-weight: bold;
-  font-family: monospace;
-  box-shadow: 0 0 18px rgba(255,255,255,0.5);
-  animation: cart-fly 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  color: #000000;
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.7), 0 8px 20px rgba(0, 0, 0, 0.6);
+  animation: cart-fly 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Cart icon bounce on item added */

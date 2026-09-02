@@ -73,7 +73,7 @@ export const useCartStore = create<CartState>((set, get) => {
       };
 
       const updated = [...current, newItem];
-      set({ skills: updated, isDrawerOpen: true });
+      set({ skills: updated });
       saveState({ skills: updated, targetAgent: get().targetAgent });
     },
 

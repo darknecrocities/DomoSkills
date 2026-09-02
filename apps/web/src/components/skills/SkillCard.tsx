@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Plus, Check, Star, Shield, ShieldCheck, AlertTriangle, ArrowUpRight, Eye } from 'lucide-react';
+import { Plus, Check, X, Star, Shield, ShieldCheck, AlertTriangle, ArrowUpRight, Eye } from 'lucide-react';
 import { Skill } from '@domoskills/validators';
 import { useCartStore } from '@/store/useCartStore';
 import { useSkillStars } from '@/lib/useSkillStars';
@@ -163,20 +163,23 @@ export function SkillCard({ skill }: SkillCardProps) {
           </span>
         </div>
 
-        {/* Add Button */}
+        {/* Add / Remove Button */}
         <button
           type="button"
           onClick={handleAddClick}
-          className={`flex items-center gap-1.5 rounded border px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition ${
+          title={isSelected ? 'Click to remove from stack' : 'Add to stack'}
+          className={`group/btn flex items-center gap-1.5 rounded border px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
             isSelected
-              ? 'border-white bg-white text-black hover:bg-muted-white shadow-sm'
+              ? 'border-border bg-surface-raised text-white hover:border-red-500/60 hover:bg-red-500/10 hover:text-red-400'
               : 'border-border bg-surface-raised text-white hover:border-white hover:bg-white hover:text-black'
           }`}
         >
           {isSelected ? (
             <>
-              <Check className="h-3.5 w-3.5" />
-              <span>Stacked</span>
+              <Check className="h-3.5 w-3.5 text-emerald-400 group-hover/btn:hidden" />
+              <X className="h-3.5 w-3.5 text-red-400 hidden group-hover/btn:inline" />
+              <span className="group-hover/btn:hidden">Stacked</span>
+              <span className="hidden group-hover/btn:inline text-red-400">Remove</span>
             </>
           ) : (
             <>

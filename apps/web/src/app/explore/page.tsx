@@ -24,6 +24,7 @@ import { CategorySlug, AgentTarget, TrustLevel, License } from '@domoskills/vali
 import { SkillCard } from '@/components/skills/SkillCard';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuth } from '@/context/AuthContext';
+import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
 
 function ExploreContent() {
   const searchParams = useSearchParams();
@@ -65,7 +66,10 @@ function ExploreContent() {
   const lockedCount = Math.max(0, searchResults.skills.length - 10);
   const teaserSkills = isLocked ? searchResults.skills.slice(10, 12) : [];
 
-  const handleAddAllFiltered = () => {
+  const handleAddAllFiltered = (e?: React.MouseEvent) => {
+    if (e) {
+      fireCartFlyAnimation(e.clientX, e.clientY, `${visibleSkills.length} Skills`);
+    }
     for (const skill of visibleSkills) {
       addSkill({
         id: skill.id,
