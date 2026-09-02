@@ -37,5 +37,7 @@ coverage
 test-project
 .test-tmp
 .test-cli-workspace
+.agent
+domoskills.json
 *.mjs
 !generate-mascot-gif.mjs

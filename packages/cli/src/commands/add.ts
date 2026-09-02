@@ -98,10 +98,14 @@ export function addCommand(
 
     // Update config
     if (!isGlobal) {
+      const repoName =
+        skill.sourceRepository.repository ||
+        (skill.sourceRepository as any).name ||
+        'skills-registry';
       const existingIdx = config.skills.findIndex((s) => s.name === skill.slug);
       const skillRecord = {
         name: skill.slug,
-        source: `${skill.sourceRepository.owner}/${skill.sourceRepository.repository}`,
+        source: `${skill.sourceRepository.owner}/${repoName}`,
         version: skill.version,
         commit: skill.commitSha,
         installedAt: new Date().toISOString(),
@@ -118,12 +122,17 @@ export function addCommand(
       writeConfig(config, cwd);
     }
 
+    const resolvedRepo =
+      skill.sourceRepository.repository ||
+      (skill.sourceRepository as any).name ||
+      'skills-registry';
+
     logger.success(
       `Installed ${pc.bold(skill.name)} (${pc.dim(skill.slug)}) v${skill.version} ` +
         pc.dim(`[${skill.license}]`)
     );
     logger.step('Location', path.relative(cwd, skillTargetDir) || skillTargetDir);
-    logger.step('Source', `${skill.sourceRepository.owner}/${skill.sourceRepository.repository} (${skill.commitSha})`);
+    logger.step('Source', `${skill.sourceRepository.owner}/${resolvedRepo} (${skill.commitSha})`);
     installedCount++;
     logger.log();
   }
