@@ -285,72 +285,35 @@ export function SkillCartDrawer() {
                     </div>
                   </div>
 
-                  {/* Itemized Table Headers */}
-                  <div>
-                    <div className="flex items-center justify-between font-bold text-[10px] uppercase tracking-wider text-text-muted pb-2 border-b border-border/80">
-                      <div className="w-1/2">Capability Item</div>
-                      <div className="w-1/4 text-center">Score</div>
-                      <div className="w-1/4 text-right">Fee</div>
-                    </div>
-
-                    {/* Receipt Items List */}
-                    <div className="divide-y divide-border/40">
-                      {skills.map((s, idx) => (
-                        <div key={s.slug} className="py-2.5 flex items-start justify-between group">
-                          <div className="w-1/2 pr-2">
-                            <div className="flex items-center gap-1.5 font-bold text-white text-[11px]">
-                              <span className="text-text-muted text-[10px]">
-                                {String(idx + 1).padStart(2, '0')}.
-                              </span>
-                              <span className="truncate">{s.name}</span>
+                  {/* Skills List */}
+                  <div className="space-y-0 divide-y divide-border/40">
+                    {skills.map((s, idx) => (
+                      <div key={s.slug} className="py-3 flex items-center justify-between group">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="text-text-muted font-mono text-[10px] shrink-0">
+                            {String(idx + 1).padStart(2, '0')}.
+                          </span>
+                          <div className="min-w-0">
+                            <div className="font-bold text-white text-[11px] truncate">{s.name}</div>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-[10px] text-text-muted capitalize">{s.category}</span>
+                              <span className="text-text-faint text-[10px]">•</span>
+                              <span className="text-[10px] text-text-muted">{s.license}</span>
                             </div>
-                            <div className="text-[10px] text-text-muted flex items-center gap-1.5 mt-0.5">
-                              <span className="capitalize">{s.category}</span>
-                              <span>•</span>
-                              <span>{s.license}</span>
-                            </div>
-                          </div>
-
-                          <div className="w-1/4 text-center text-[11px] text-emerald-400 font-semibold pt-0.5">
-                            100% AST
-                          </div>
-
-                          <div className="w-1/4 flex items-center justify-end gap-2 text-right pt-0.5">
-                            <span className="text-white font-bold text-[11px]">$0.00</span>
-                            {!isConfirmed && (
-                              <button
-                                type="button"
-                                onClick={() => removeSkill(s.slug)}
-                                className="text-text-muted hover:text-red-400 opacity-60 group-hover:opacity-100 transition p-0.5"
-                                title="Remove item"
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            )}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Financial Breakdown */}
-                  <div className="border-t border-dashed border-border/80 pt-4 space-y-1.5 text-[11px]">
-                    <div className="flex items-center justify-between text-text-muted">
-                      <span>SUBTOTAL ({skills.length} Capabilities):</span>
-                      <span className="text-white font-mono">$0.00</span>
-                    </div>
-                    <div className="flex items-center justify-between text-text-muted">
-                      <span>OPEN SOURCE ECOSYSTEM FEE:</span>
-                      <span className="text-emerald-400 font-mono">$0.00 (FREE)</span>
-                    </div>
-                    <div className="flex items-center justify-between text-text-muted">
-                      <span>COMMUNITY PROTOCOL FEE:</span>
-                      <span className="text-emerald-400 font-mono">$0.00 (ZERO)</span>
-                    </div>
-                    <div className="border-t border-border pt-2 flex items-center justify-between font-bold text-xs text-white">
-                      <span>TOTAL DUE:</span>
-                      <span className="text-emerald-400 text-sm">$0.00 (100% FREE)</span>
-                    </div>
+                        {!isConfirmed && (
+                          <button
+                            type="button"
+                            onClick={() => removeSkill(s.slug)}
+                            className="text-text-muted hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-1 shrink-0 ml-2"
+                            title="Remove"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
                   </div>
 
                   {/* Receipt Stamp / Confirmation Status */}
@@ -469,9 +432,9 @@ export function SkillCartDrawer() {
           {/* Drawer Sticky Footer Actions */}
           {skills.length > 0 && !isConfirmed && (
             <div className="border-t border-border bg-surface p-4 sm:p-5 flex items-center justify-between gap-3">
-              <div className="font-mono text-xs">
-                <span className="text-text-muted">Total: </span>
-                <span className="text-emerald-400 font-bold">$0.00 FREE</span>
+              <div className="font-mono text-xs text-text-muted">
+                <span className="text-white font-bold">{skills.length}</span>{' '}
+                skill{skills.length === 1 ? '' : 's'} ready to install
               </div>
 
               <button

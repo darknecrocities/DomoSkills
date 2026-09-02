@@ -2,10 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Plus, Check, Star, Shield, ShieldCheck, AlertTriangle, ArrowUpRight, FileCode, Eye } from 'lucide-react';
+import { Plus, Check, Star, Shield, ShieldCheck, AlertTriangle, ArrowUpRight, Eye } from 'lucide-react';
 import { Skill } from '@domoskills/validators';
 import { useCartStore } from '@/store/useCartStore';
 import { useSkillStars } from '@/lib/useSkillStars';
+import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
 
 interface SkillCardProps {
   skill: Skill;
@@ -23,9 +24,16 @@ export function SkillCard({ skill }: SkillCardProps) {
 
   const isSelected = mounted ? hasSkill(skill.slug) : false;
 
-  const handleAddClick = (e: React.MouseEvent) => {
+  const handleAddClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Fire the fly animation from the click position toward the cart icon
+    if (!isSelected) {
+      fireCartFlyAnimation(e.clientX, e.clientY, skill.name);
+    }
+
+    // Toggle the cart state (no drawer open)
     toggleSkill({
       id: skill.id,
       slug: skill.slug,
@@ -35,6 +43,7 @@ export function SkillCard({ skill }: SkillCardProps) {
       trustLevel: skill.trustLevel,
     });
   };
+
 
   const getTrustBadge = () => {
     switch (skill.trustLevel) {

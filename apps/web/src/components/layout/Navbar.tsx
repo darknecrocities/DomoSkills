@@ -119,6 +119,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
 
           {/* Skill Stack Cart Button */}
           <button
+            id="navbar-cart-btn"
             type="button"
             onClick={() => setDrawerOpen(!isDrawerOpen)}
             className={`relative flex items-center gap-2 rounded border px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition ${

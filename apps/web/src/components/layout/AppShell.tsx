@@ -11,6 +11,7 @@ import { CommandPalette } from '../command/CommandPalette';
 import { AuthProvider } from '@/context/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
 import { recordVisit } from '@/lib/firestoreMetrics';
+import { CartFlyAnimation } from '../cart/CartFlyAnimation';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -43,6 +44,7 @@ export function AppShell({ children }: AppShellProps) {
         <SkillCartDrawer />
         <InstallModal />
         <AuthModal />
+        <CartFlyAnimation />
         <CommandPalette
           isOpen={commandPaletteOpen}
           onClose={() => setCommandPaletteOpen(false)}

@@ -220,3 +220,50 @@ code, pre, kbd {
     animation: none !important;
   }
 }
+
+/* Flying-to-cart particle animation */
+@keyframes cart-fly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--fly-x), var(--fly-y)) scale(0.15);
+    opacity: 0;
+  }
+}
+
+.cart-fly-particle {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: monospace;
+  box-shadow: 0 0 18px rgba(255,255,255,0.5);
+  animation: cart-fly 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Cart icon bounce on item added */
+@keyframes cart-bounce {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.35) rotate(-8deg); }
+  60% { transform: scale(0.9) rotate(4deg); }
+  80% { transform: scale(1.12); }
+}
+
+.cart-bounce {
+  animation: cart-bounce 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+}
+
