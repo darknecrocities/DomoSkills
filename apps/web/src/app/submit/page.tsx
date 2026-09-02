@@ -240,7 +240,7 @@ ${builderInstructions}
 
       setSubmissionResult({
         success: res.success,
-        message: res.message || 'Skill accepted, AST security verified, and published to Firestore & Registry!',
+        message: res.message || 'Skill accepted, AST security verified, and published to DomoSkills Registry!',
         score: validation.security.securityScore,
         docId: firestoreDocId || `sub_${Date.now().toString(36)}`,
         slug: payload.slug,
@@ -273,7 +273,7 @@ ${builderInstructions}
             </h1>
             <p className="font-sans text-sm sm:text-base text-text-secondary leading-relaxed">
               Design new AI agent capabilities with our visual creator, upload local <code className="text-white">SKILL.md</code> files,
-              or index open-source GitHub repositories with live AST security verification and Firestore synchronization.
+              or index open-source GitHub repositories with live AST security verification and registry synchronization.
             </p>
           </div>
 
@@ -301,7 +301,7 @@ ${builderInstructions}
             </div>
             <div className="hidden sm:flex items-center gap-2 text-text-muted text-[11px]">
               <Shield className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Firestore Sync Active</span>
+              <span>Cloud Sync Active</span>
             </div>
           </div>
         ) : null}
@@ -341,7 +341,7 @@ ${builderInstructions}
                   </div>
                   <div className="flex items-center gap-2 text-white">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                    <span>Real-time Firestore & decentralized registry synchronization</span>
+                    <span>Real-time cloud & open-source registry synchronization</span>
                   </div>
                   <div className="flex items-center gap-2 text-white">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
@@ -754,7 +754,7 @@ ${builderInstructions}
                     className="flex items-center gap-2 rounded-lg border border-white bg-white px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black hover:bg-muted-white transition shadow-[0_0_25px_rgba(255,255,255,0.2)] disabled:opacity-50"
                   >
                     <Sparkles className="h-4 w-4 text-emerald-500" />
-                    <span>{isSubmitting ? 'Syncing to Firestore...' : 'Publish to DomoSkills'}</span>
+                    <span>{isSubmitting ? 'Publishing Capability...' : 'Publish to DomoSkills'}</span>
                   </button>
                 </div>
 

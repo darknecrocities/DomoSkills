@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { CursorSpotlight } from '../effects/CursorSpotlight';
@@ -9,6 +10,7 @@ import { InstallModal } from '../modals/InstallModal';
 import { CommandPalette } from '../command/CommandPalette';
 import { AuthProvider } from '@/context/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
+import { recordVisit } from '@/lib/firestoreMetrics';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -16,6 +18,11 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    recordVisit();
+  }, [pathname]);
 
   return (
     <AuthProvider>

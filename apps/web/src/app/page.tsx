@@ -154,13 +154,13 @@ export default function HomePage() {
                   <div title="Total indexed capabilities in registry">
                     <span className="text-white font-bold">{stats.totalSkills}</span> Skills
                   </div>
-                  <div title="Total skill installations / CLI downloads recorded in Firestore">
+                  <div title="Total verified skill installations & CLI downloads">
                     <span suppressHydrationWarning className="text-white font-bold">{formattedInstalls}</span> Downloads
                   </div>
-                  <div title="Total registered developers synced with Firestore">
+                  <div title="Total registered developers in community">
                     <span suppressHydrationWarning className="text-white font-bold">{formattedUsers}</span> Registered
                   </div>
-                  <div title="Total site visits counter recorded in Firestore">
+                  <div title="Total site visits counter">
                     <span suppressHydrationWarning className="text-white font-bold">{formattedVisits}</span> Visits
                   </div>
                 </div>
@@ -423,11 +423,11 @@ export default function HomePage() {
                 </a>
               </div>
 
-              {/* Live Firestore Telemetry Footnote */}
+              {/* Live Registry Sync Footnote */}
               <div className="pt-3 border-t border-border/60 flex flex-wrap items-center gap-4 text-[11px] font-mono text-text-muted">
                 <div className="flex items-center gap-1.5 text-emerald-400">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="font-bold">Firestore Telemetry Sync: Online</span>
+                  <span className="font-bold">Registry Sync: Online</span>
                 </div>
                 <div>• {formattedUsers} Developers</div>
                 <div>• {formattedInstalls} Installs</div>

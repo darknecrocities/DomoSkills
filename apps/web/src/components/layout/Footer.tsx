@@ -38,7 +38,7 @@ export function Footer() {
             <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-text-muted">
               <div className="inline-flex items-center gap-2 rounded border border-border bg-surface px-3 py-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Firestore Live Sync: Online</span>
+                <span>Registry Sync: Active</span>
               </div>
               <a
                 href="https://github.com/darknecrocities/DomoSkills"

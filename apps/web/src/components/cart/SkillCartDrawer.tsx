@@ -344,7 +344,7 @@ export function SkillCartDrawer() {
                       <span className="text-emerald-400 font-mono">$0.00 (FREE)</span>
                     </div>
                     <div className="flex items-center justify-between text-text-muted">
-                      <span>COMMUNITY TELEMETRY TAX:</span>
+                      <span>COMMUNITY PROTOCOL FEE:</span>
                       <span className="text-emerald-400 font-mono">$0.00 (ZERO)</span>
                     </div>
                     <div className="border-t border-border pt-2 flex items-center justify-between font-bold text-xs text-white">
@@ -361,7 +361,7 @@ export function SkillCartDrawer() {
                         <span>MANIFEST COMPILED & CONFIRMED</span>
                       </div>
                       <p className="text-[10px] text-text-secondary font-sans leading-relaxed">
-                        Linked and synchronized to Firestore database. Ready to execute on your local workspace terminal.
+                        Linked and synchronized to Registry Cloud. Ready to execute on your local workspace terminal.
                       </p>
                     </div>
                   ) : (
@@ -372,7 +372,7 @@ export function SkillCartDrawer() {
                       className="w-full flex items-center justify-center gap-2 rounded-xl border border-white bg-white py-3.5 font-mono text-xs font-bold uppercase tracking-wider text-black hover:bg-muted-white transition shadow-[0_0_25px_rgba(255,255,255,0.18)] cursor-pointer disabled:opacity-50"
                     >
                       {isConfirming ? (
-                        <span>Compiling & Linking to Firestore...</span>
+                        <span>Compiling & Synchronizing Stack...</span>
                       ) : (
                         <>
                           <Sparkles className="h-4 w-4" />

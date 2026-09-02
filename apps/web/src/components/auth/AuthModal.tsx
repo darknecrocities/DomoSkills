@@ -156,7 +156,7 @@ export function AuthModal() {
 
           {/* Left Footer Subtext */}
           <div className="pt-6 border-t border-border/60 text-[10px] font-mono text-text-muted relative z-10">
-            Powered by Domo AST Engine • Zero Telemetry • 100% Free
+            Powered by Domo AST Engine • 100% Private & Open Source
           </div>
 
         </div>
@@ -201,11 +201,11 @@ export function AuthModal() {
               <div className="rounded-xl border border-amber-500/40 bg-amber-950/30 p-4 font-mono text-xs space-y-3 text-amber-200 animate-fade-in">
                 <div className="flex items-center gap-2 font-bold text-amber-300">
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>Firebase Authorized Domain Required</span>
+                  <span>OAuth Domain Authorization Required</span>
                 </div>
                 
                 <p className="text-[11px] font-sans text-amber-200/90 leading-relaxed">
-                  Firebase project <code className="text-white bg-black/50 px-1.5 py-0.5 rounded font-mono">domoskills</code> blocks Google popup OAuth on <code className="text-white bg-black/50 px-1.5 py-0.5 rounded font-mono">localhost</code> until it is added to Authorized Domains.
+                  Local domain <code className="text-white bg-black/50 px-1.5 py-0.5 rounded font-mono">localhost</code> must be added to your Authorized Domains list in OAuth settings for popup authentication.
                 </p>
 
                 <div className="pt-1">
@@ -215,7 +215,7 @@ export function AuthModal() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 rounded-lg border border-amber-400/50 bg-amber-400/20 px-3 py-1.5 text-[11px] font-bold text-amber-100 hover:bg-amber-400/30 transition shadow-sm"
                   >
-                    <span>Add &apos;localhost&apos; in Firebase Console</span>
+                    <span>Configure Authorized Domains Settings</span>
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
