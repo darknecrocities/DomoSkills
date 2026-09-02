@@ -151,14 +151,15 @@
     transform: translateX(0%);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
   }
 }
 
 .animate-belt-marquee {
   display: flex;
   width: max-content;
-  animation: beltMarquee 28s linear infinite;
+  will-change: transform;
+  animation: beltMarquee 35s linear infinite;
 }
 
 .animate-belt-marquee:hover {
