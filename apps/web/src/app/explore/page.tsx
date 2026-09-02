@@ -121,10 +121,14 @@ function ExploreContent() {
   };
 
   const handleAddAllFiltered = (e?: React.MouseEvent) => {
+    if (!user) {
+      openAuthModal('signup');
+      return;
+    }
     if (e) {
       fireCartFlyAnimation(e.clientX, e.clientY, `${searchResults.skills.length} Skills`);
     }
-    for (const skill of isLocked ? searchResults.skills.slice(0, 10) : searchResults.skills) {
+    for (const skill of searchResults.skills) {
       addSkill({
         id: skill.id,
         slug: skill.slug,

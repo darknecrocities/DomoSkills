@@ -6,6 +6,7 @@ import { Plus, Check, X, Star, Shield, ShieldCheck, AlertTriangle, ArrowUpRight,
 import { Skill } from '@domoskills/validators';
 import { useCartStore } from '@/store/useCartStore';
 import { useSkillStars } from '@/lib/useSkillStars';
+import { useAuth } from '@/context/AuthContext';
 import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
 
 interface SkillCardProps {
@@ -15,6 +16,7 @@ interface SkillCardProps {
 export function SkillCard({ skill }: SkillCardProps) {
   const [mounted, setMounted] = React.useState(false);
   const { hasSkill, toggleSkill } = useCartStore();
+  const { user, openAuthModal } = useAuth();
   const baselineStars = skill.sourceRepository?.stars || 0;
   const { isStarred, formattedStars, toggleStar } = useSkillStars(skill.slug, baselineStars);
 
@@ -27,6 +29,12 @@ export function SkillCard({ skill }: SkillCardProps) {
   const handleAddClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Enforce login requirement: cart and add only enabled when user is logged in
+    if (!user) {
+      openAuthModal('signup');
+      return;
+    }
 
     // Fire the fly animation from the click position toward the cart icon
     if (!isSelected) {

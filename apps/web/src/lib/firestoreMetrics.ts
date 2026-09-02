@@ -10,6 +10,11 @@ import {
   serverTimestamp,
   collection,
   getCountFromServer,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  limit,
 } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '@/lib/firebase';
 import { registry } from '@domoskills/registry';
@@ -384,4 +389,53 @@ export async function recordStackReceipt(data: StackReceiptData): Promise<{ succ
   }
 
   return { success: true, manifestId };
+}
+
+/**
+ * Retrieve user's stack receipt history (local storage + cloud sync)
+ */
+export async function getUserStackHistory(userId?: string | null): Promise<StackReceiptData[]> {
+  const localList: StackReceiptData[] = [];
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('domoskills_stack_receipts');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          localList.push(...parsed);
+        }
+      }
+    } catch {}
+  }
+
+  if (isFirebaseConfigured && db && userId) {
+    try {
+      const q = query(
+        collection(db, 'stacks'),
+        where('userId', '==', userId),
+        orderBy('confirmedAt', 'desc'),
+        limit(30)
+      );
+      const snap = await getDocs(q);
+      const cloudList: StackReceiptData[] = [];
+      snap.forEach((docSnap) => {
+        cloudList.push(docSnap.data() as StackReceiptData);
+      });
+      if (cloudList.length > 0) {
+        const seen = new Set<string>();
+        const merged: StackReceiptData[] = [];
+        for (const item of [...cloudList, ...localList]) {
+          if (item.manifestId && !seen.has(item.manifestId)) {
+            seen.add(item.manifestId);
+            merged.push(item);
+          }
+        }
+        return merged;
+      }
+    } catch {
+      // Fallback to local
+    }
+  }
+
+  return localList;
 }

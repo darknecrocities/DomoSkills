@@ -29,6 +29,7 @@ import { AGENT_TARGET_LIST, getAdapter, generateInstallCommand } from '@domoskil
 import { AgentTarget } from '@domoskills/validators';
 import { useCartStore } from '@/store/useCartStore';
 import { useSkillStars } from '@/lib/useSkillStars';
+import { useAuth } from '@/context/AuthContext';
 import { FileTreeViewer } from '@/components/skills/FileTreeViewer';
 import { recordDownload } from '@/lib/firestoreMetrics';
 import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
@@ -36,6 +37,7 @@ import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
 export default function SkillDetailPage() {
   const params = useParams();
   const slug = params?.slug as string;
+  const { user, openAuthModal } = useAuth();
 
   const skill = registry.getSkillBySlug(slug);
   if (!skill) {
@@ -183,6 +185,10 @@ export default function SkillDetailPage() {
               <button
                 type="button"
                 onClick={(e) => {
+                  if (!user) {
+                    openAuthModal('signup');
+                    return;
+                  }
                   if (!isSelected) {
                     fireCartFlyAnimation(e.clientX, e.clientY, skill.name);
                   }
