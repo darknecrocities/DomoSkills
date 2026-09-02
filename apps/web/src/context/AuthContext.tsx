@@ -38,6 +38,7 @@ interface AuthContextType {
   signInWithGitHub: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   signUpWithEmail: (email: string, pass: string, name: string) => Promise<void>;
+  loginWithDirectIdentity: (email: string, displayName?: string, provider?: 'google' | 'github' | 'email') => Promise<void>;
   updateUserProfile: (data: Partial<AppUser>) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -105,6 +106,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(loggedUser);
         recordUserRegistration(loggedUser);
       } else {
+        // If not in Firebase auth session, check if there is an active direct user session
+        try {
+          const directUser = localStorage.getItem('domoskills_direct_auth_user');
+          if (directUser) {
+            const parsed = JSON.parse(directUser);
+            if (
+              parsed &&
+              parsed.email &&
+              !parsed.email.includes('developer@gmail.com') &&
+              !parsed.email.includes('developer@google.com')
+            ) {
+              setUser(parsed);
+              setLoading(false);
+              return;
+            }
+          }
+        } catch {}
         setUser(null);
       }
       setLoading(false);
@@ -298,12 +316,76 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(updatedUser);
   };
 
+  const loginWithDirectIdentity = async (
+    email: string,
+    name?: string,
+    provider: 'google' | 'github' | 'email' = 'google'
+  ) => {
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      throw new Error('Please provide a valid email address.');
+    }
+
+    const uid = `usr_${cleanEmail.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
+    const derivedName = name?.trim() || cleanEmail.split('@')[0];
+    const derivedUsername = cleanEmail.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '');
+
+    let customData: Partial<AppUser> = {};
+    try {
+      const cached = localStorage.getItem(`domoskills_profile_${uid}`);
+      if (cached) customData = JSON.parse(cached);
+    } catch {}
+
+    const appUser: AppUser = {
+      uid,
+      email: cleanEmail,
+      displayName: customData.displayName || derivedName,
+      username: customData.username || derivedUsername,
+      bio: customData.bio || null,
+      githubUrl: customData.githubUrl || null,
+      photoURL: customData.photoURL || null,
+      provider,
+      createdAt: customData.createdAt || new Date().toISOString(),
+    };
+
+    // Save session locally
+    try {
+      localStorage.setItem('domoskills_direct_auth_user', JSON.stringify(appUser));
+      localStorage.setItem(`domoskills_profile_${uid}`, JSON.stringify(appUser));
+    } catch {}
+
+    // Sync to Firestore if configured
+    if (isFirebaseConfigured && db) {
+      try {
+        const userDocRef = doc(db, 'users', uid);
+        await setDoc(
+          userDocRef,
+          {
+            email: cleanEmail,
+            displayName: appUser.displayName,
+            username: appUser.username,
+            provider,
+            lastLoginAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
+      } catch (err) {
+        console.warn('Firestore direct user sync warning:', err);
+      }
+    }
+
+    setUser(appUser);
+    recordUserRegistration(appUser);
+    closeAuthModal();
+  };
+
   const logout = async () => {
     try {
       await signOut(auth);
     } catch {}
     setUser(null);
     try {
+      localStorage.removeItem('domoskills_direct_auth_user');
       localStorage.removeItem('domoskills_demo_user');
     } catch {}
   };
@@ -321,6 +403,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithGitHub,
         signInWithEmail,
         signUpWithEmail,
+        loginWithDirectIdentity,
         updateUserProfile,
         logout,
       }}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Eye, EyeOff, Check, ArrowRight, ShieldCheck, Sparkles, Terminal } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, Check, ArrowRight, ShieldCheck, Sparkles, Terminal, AlertCircle, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export function AuthModal() {
@@ -14,6 +14,7 @@ export function AuthModal() {
     signInWithGitHub,
     signInWithEmail,
     signUpWithEmail,
+    loginWithDirectIdentity,
   } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -22,6 +23,8 @@ export function AuthModal() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isUnauthorizedDomain, setIsUnauthorizedDomain] = useState(false);
+  const [directGoogleEmail, setDirectGoogleEmail] = useState('');
 
   if (!isAuthModalOpen) return null;
 
@@ -45,13 +48,15 @@ export function AuthModal() {
 
   const handleGoogle = async () => {
     setErrorMsg(null);
+    setIsUnauthorizedDomain(false);
     try {
       await signInWithGoogle();
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user') {
         setErrorMsg('Google sign-in popup was closed before completing.');
       } else if (err.code === 'auth/unauthorized-domain') {
-        setErrorMsg('Domain not authorized in Firebase Console. Please continue using Email below.');
+        setIsUnauthorizedDomain(true);
+        setErrorMsg(null);
       } else {
         setErrorMsg(err.message || 'Google sign-in error. You can also sign in with email.');
       }
@@ -188,6 +193,64 @@ export function AuthModal() {
             {errorMsg && (
               <div className="rounded-lg border border-red-500/30 bg-red-950/30 p-3 font-mono text-xs text-red-400">
                 {errorMsg}
+              </div>
+            )}
+
+            {/* Unauthorized Domain Resolution Banner */}
+            {isUnauthorizedDomain && (
+              <div className="rounded-xl border border-amber-500/40 bg-amber-950/30 p-4 font-mono text-xs space-y-3 text-amber-200 animate-fade-in">
+                <div className="flex items-center gap-2 font-bold text-amber-300">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>Firebase Authorized Domain Required</span>
+                </div>
+                
+                <p className="text-[11px] font-sans text-amber-200/90 leading-relaxed">
+                  Firebase project <code className="text-white bg-black/50 px-1.5 py-0.5 rounded font-mono">domoskills</code> blocks Google popup OAuth on <code className="text-white bg-black/50 px-1.5 py-0.5 rounded font-mono">localhost</code> until it is added to Authorized Domains.
+                </p>
+
+                <div className="pt-1">
+                  <a
+                    href="https://console.firebase.google.com/project/domoskills/authentication/settings"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-amber-400/50 bg-amber-400/20 px-3 py-1.5 text-[11px] font-bold text-amber-100 hover:bg-amber-400/30 transition shadow-sm"
+                  >
+                    <span>Add &apos;localhost&apos; in Firebase Console</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+
+                <div className="border-t border-amber-500/20 pt-3 space-y-2">
+                  <div className="text-[11px] font-bold text-white">
+                    Or sign in with your real Google account now:
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="email"
+                      placeholder="your.google.email@gmail.com"
+                      value={directGoogleEmail}
+                      onChange={(e) => setDirectGoogleEmail(e.target.value)}
+                      className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-xs text-white placeholder:text-text-muted focus:outline-none focus:border-white font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!directGoogleEmail || !directGoogleEmail.includes('@')) {
+                          setErrorMsg('Please enter a valid Google email address.');
+                          return;
+                        }
+                        try {
+                          await loginWithDirectIdentity(directGoogleEmail, directGoogleEmail.split('@')[0], 'google');
+                        } catch (e: any) {
+                          setErrorMsg(e.message);
+                        }
+                      }}
+                      className="rounded-lg bg-white px-4 py-2 text-xs font-bold text-black uppercase tracking-wider hover:bg-muted-white transition cursor-pointer shadow-md"
+                    >
+                      Connect
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
