@@ -27,6 +27,7 @@ import { registry } from '@domoskills/registry';
 import { AGENT_TARGET_LIST, getAdapter, generateInstallCommand } from '@domoskills/adapters';
 import { AgentTarget } from '@domoskills/validators';
 import { useCartStore } from '@/store/useCartStore';
+import { useSkillStars } from '@/lib/useSkillStars';
 import { FileTreeViewer } from '@/components/skills/FileTreeViewer';
 import { recordDownload } from '@/lib/firestoreMetrics';
 
@@ -41,6 +42,8 @@ export default function SkillDetailPage() {
 
   const [mounted, setMounted] = useState(false);
   const { targetAgent, hasSkill, toggleSkill, setTargetAgent } = useCartStore();
+  const baselineStars = skill.sourceRepository?.stars || 0;
+  const { isStarred, formattedStars, toggleStar } = useSkillStars(skill.slug, baselineStars);
   
   useEffect(() => {
     setMounted(true);
@@ -106,6 +109,19 @@ export default function SkillDetailPage() {
                     <Shield className="h-3.5 w-3.5" /> Verified
                   </span>
                 )}
+                <button
+                  type="button"
+                  onClick={toggleStar}
+                  title={isStarred ? 'Unstar capability' : 'Star capability'}
+                  className={`inline-flex items-center gap-1.5 rounded border px-2.5 py-0.5 text-[11px] font-semibold transition cursor-pointer ${
+                    isStarred
+                      ? 'border-amber-400/40 bg-amber-400/10 text-amber-400 shadow-sm'
+                      : 'border-border bg-surface-raised text-text-secondary hover:border-white hover:text-white'
+                  }`}
+                >
+                  <Star className={`h-3 w-3 ${isStarred ? 'fill-amber-400 text-amber-400' : 'text-text-secondary'}`} />
+                  <span suppressHydrationWarning>{formattedStars} Stars</span>
+                </button>
               </div>
 
               <h1 className="font-sans text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
@@ -193,16 +209,31 @@ export default function SkillDetailPage() {
                 )}
               </button>
 
-              <a
-                href={skill.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-1.5 rounded border border-border bg-surface py-2 text-text-secondary hover:text-white hover:border-white transition text-[11px]"
-              >
-                <Github className="h-3.5 w-3.5" />
-                <span>View Source on GitHub</span>
-                <ExternalLink className="h-3 w-3 ml-0.5 text-text-muted" />
-              </a>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={toggleStar}
+                  className={`flex items-center justify-center gap-1.5 rounded border py-2 text-[11px] font-semibold transition ${
+                    isStarred
+                      ? 'border-amber-400/40 bg-amber-400/10 text-amber-400'
+                      : 'border-border bg-surface text-text-secondary hover:text-white hover:border-white'
+                  }`}
+                >
+                  <Star className={`h-3.5 w-3.5 ${isStarred ? 'fill-amber-400 text-amber-400' : ''}`} />
+                  <span>{isStarred ? 'Starred' : 'Star'} ({formattedStars})</span>
+                </button>
+
+                <a
+                  href={skill.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 rounded border border-border bg-surface py-2 text-text-secondary hover:text-white hover:border-white transition text-[11px]"
+                >
+                  <Github className="h-3.5 w-3.5" />
+                  <span>GitHub</span>
+                  <ExternalLink className="h-3 w-3 ml-0.5 text-text-muted" />
+                </a>
+              </div>
 
               {/* Safety guarantee */}
               <div className="border-t border-border pt-3 text-[10px] text-text-muted space-y-1">

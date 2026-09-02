@@ -12,6 +12,7 @@
     "cli": "node packages/cli/bin/domoskills.js"
   },
   "devDependencies": {
+    "domoskills": "workspace:*",
     "turbo": "^2.4.4",
     "typescript": "^5.8.2"
   },

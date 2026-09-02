@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Plus, Check, Star, Shield, ShieldCheck, AlertTriangle, ArrowUpRight, FileCode, Eye } from 'lucide-react';
 import { Skill } from '@domoskills/validators';
 import { useCartStore } from '@/store/useCartStore';
+import { useSkillStars } from '@/lib/useSkillStars';
 
 interface SkillCardProps {
   skill: Skill;
@@ -13,6 +14,8 @@ interface SkillCardProps {
 export function SkillCard({ skill }: SkillCardProps) {
   const [mounted, setMounted] = React.useState(false);
   const { hasSkill, toggleSkill } = useCartStore();
+  const baselineStars = skill.sourceRepository?.stars || 0;
+  const { isStarred, formattedStars, toggleStar } = useSkillStars(skill.slug, baselineStars);
 
   React.useEffect(() => {
     setMounted(true);
@@ -126,12 +129,27 @@ export function SkillCard({ skill }: SkillCardProps) {
 
       {/* Card Footer Bar */}
       <div className="mt-6 flex items-center justify-between border-t border-border pt-3.5">
-        <div className="flex items-center gap-3 font-mono text-xs text-text-muted">
-          <span className="flex items-center gap-1">
-            <Star className="h-3 w-3 text-text-secondary" />
-            {(skill.installs / 1000).toFixed(1)}k
-          </span>
-          <span className="rounded border border-border px-1 py-0.2 text-[10px]">
+        <div className="flex items-center gap-2.5 font-mono text-xs text-text-muted">
+          <button
+            type="button"
+            onClick={toggleStar}
+            title={isStarred ? 'Unstar this skill' : 'Star this skill'}
+            className={`flex items-center gap-1 px-1.5 py-0.5 rounded transition ${
+              isStarred
+                ? 'text-amber-400 bg-amber-400/10 border border-amber-400/30'
+                : 'text-text-secondary hover:text-white hover:bg-surface-raised border border-transparent'
+            }`}
+          >
+            <Star
+              className={`h-3 w-3 transition-transform ${
+                isStarred ? 'fill-amber-400 text-amber-400 scale-110' : 'text-text-secondary'
+              }`}
+            />
+            <span suppressHydrationWarning className="font-semibold text-[11px]">
+              {formattedStars}
+            </span>
+          </button>
+          <span className="rounded border border-border px-1.5 py-0.5 text-[10px]">
             {skill.license}
           </span>
         </div>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, ShoppingBag, Menu, X, Github, User, LogOut, Sparkles, Layers, ChevronDown, Star } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, Github, User, LogOut, Sparkles, Layers, ChevronDown, Star, Settings } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuth } from '@/context/AuthContext';
 import { useGitHubStars } from '@/lib/useGitHubStars';
@@ -165,8 +165,15 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
                     <span className="text-white font-bold truncate block">{currentUser.email}</span>
                   </div>
                   <Link
-                    href="/explore"
+                    href="/settings"
                     className="flex items-center gap-2 px-3 py-2 rounded text-text-secondary hover:text-white hover:bg-surface transition mt-1"
+                  >
+                    <Settings className="h-3.5 w-3.5 text-cyan-400" />
+                    <span>Profile & Settings</span>
+                  </Link>
+                  <Link
+                    href="/explore"
+                    className="flex items-center gap-2 px-3 py-2 rounded text-text-secondary hover:text-white hover:bg-surface transition"
                   >
                     <Layers className="h-3.5 w-3.5" />
                     <span>My Stacks & Cart</span>
@@ -240,17 +247,27 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
                 <span>Sign In / Register</span>
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  logout();
-                }}
-                className="flex items-center gap-2 px-3 py-2 text-left uppercase tracking-wider text-red-400 hover:bg-surface rounded font-bold"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Log Out ({currentUser.displayName})</span>
-              </button>
+              <>
+                <Link
+                  href="/settings"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 uppercase tracking-wider text-cyan-400 hover:bg-surface rounded font-bold"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span>Profile & Settings</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    logout();
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 text-left uppercase tracking-wider text-red-400 hover:bg-surface rounded font-bold"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Log Out ({currentUser.displayName})</span>
+                </button>
+              </>
             )}
             <a
               href="https://github.com/darknecrocities/DomoSkills"

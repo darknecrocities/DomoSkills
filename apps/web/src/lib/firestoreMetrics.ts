@@ -271,3 +271,60 @@ export function useLiveTelemetry() {
     formattedInstalls: formatMetric(stats.totalInstalls),
   };
 }
+
+export interface StackReceiptData {
+  manifestId: string;
+  userId?: string | null;
+  userEmail?: string | null;
+  targetAgent: string;
+  skills: Array<{
+    slug: string;
+    name: string;
+    category: string;
+    version?: string;
+    license: string;
+  }>;
+  totalSkills: number;
+  installCommand: string;
+  createdAt?: string;
+}
+
+/**
+ * Record a confirmed stack receipt in Firestore and local storage
+ */
+export async function recordStackReceipt(data: StackReceiptData): Promise<{ success: boolean; manifestId: string }> {
+  const manifestId = data.manifestId || `DOMO-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
+  // 1. Save to local storage history
+  if (typeof window !== 'undefined') {
+    try {
+      const existing = JSON.parse(localStorage.getItem('domoskills_stack_receipts') || '[]');
+      const updated = [{ ...data, manifestId, createdAt: new Date().toISOString() }, ...existing].slice(0, 50);
+      localStorage.setItem('domoskills_stack_receipts', JSON.stringify(updated));
+    } catch {}
+  }
+
+  // Record metrics count
+  recordDownload(undefined, Math.max(1, data.skills.length));
+
+  // 2. Save to Firestore if available
+  if (isFirebaseConfigured && db) {
+    try {
+      const receiptDocRef = doc(db, 'stacks', manifestId);
+      await setDoc(
+        receiptDocRef,
+        {
+          ...data,
+          manifestId,
+          confirmedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.warn('Firestore stack receipt sync warning:', err);
+    }
+  }
+
+  return { success: true, manifestId };
+}
+

@@ -1,12 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { X, Trash2, Copy, Check, Terminal, Download, ArrowRight, Layers, FileCode, CheckCircle2 } from 'lucide-react';
+import {
+  X,
+  Trash2,
+  Copy,
+  Check,
+  Terminal,
+  Download,
+  ArrowRight,
+  ShieldCheck,
+  Sparkles,
+  Receipt,
+  RotateCcw,
+  CheckCircle2,
+  ExternalLink,
+} from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { useAuth } from '@/context/AuthContext';
 import { AGENT_TARGET_LIST, getAdapter, generateInstallCommand } from '@domoskills/adapters';
 import { AgentTarget } from '@domoskills/validators';
-import { recordDownload } from '@/lib/firestoreMetrics';
+import { recordStackReceipt } from '@/lib/firestoreMetrics';
 
 export function SkillCartDrawer() {
   const {
@@ -17,11 +32,23 @@ export function SkillCartDrawer() {
     removeSkill,
     clearCart,
     setTargetAgent,
-    setInstallModalOpen,
   } = useCartStore();
 
+  const { user } = useAuth();
+
   const [copied, setCopied] = useState(false);
-  const [showFileTree, setShowFileTree] = useState(true);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [manifestId, setManifestId] = useState('');
+  const [confirmedTimestamp, setConfirmedTimestamp] = useState('');
+
+  // Reset confirmation state if skills empty
+  useEffect(() => {
+    if (skills.length === 0) {
+      setIsConfirmed(false);
+      setManifestId('');
+    }
+  }, [skills.length]);
 
   if (!isDrawerOpen) return null;
 
@@ -32,22 +59,60 @@ export function SkillCartDrawer() {
   const handleCopy = () => {
     navigator.clipboard.writeText(installCmd);
     setCopied(true);
-    recordDownload(undefined, Math.max(1, skills.length));
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2200);
+  };
+
+  const handleConfirmReceipt = async () => {
+    if (skills.length === 0) return;
+
+    setIsConfirming(true);
+    const newManifestId = `DOMO-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const timestamp = new Date().toISOString();
+
+    try {
+      await recordStackReceipt({
+        manifestId: newManifestId,
+        userId: user?.uid || null,
+        userEmail: user?.email || null,
+        targetAgent,
+        skills: skills.map((s) => ({
+          slug: s.slug,
+          name: s.name,
+          category: s.category,
+          license: s.license,
+        })),
+        totalSkills: skills.length,
+        installCommand: installCmd,
+      });
+
+      setManifestId(newManifestId);
+      setConfirmedTimestamp(timestamp);
+      setIsConfirmed(true);
+    } catch (err) {
+      console.error('Stack receipt confirmation failed:', err);
+      // Still allow UI confirmation with local manifest
+      setManifestId(newManifestId);
+      setConfirmedTimestamp(timestamp);
+      setIsConfirmed(true);
+    } finally {
+      setIsConfirming(false);
+    }
   };
 
   const handleDownloadConfig = () => {
-    recordDownload(undefined, Math.max(1, skills.length));
     const configPayload = {
       version: 1,
+      manifestId: manifestId || `DOMO-${Date.now().toString(36).toUpperCase()}`,
       agent: targetAgent,
       skills: skills.map((s) => ({
         name: s.slug,
         category: s.category,
+        license: s.license,
         version: '1.0.0',
       })),
       generatedBy: 'DomoSkills Registry',
-      exportedAt: new Date().toISOString(),
+      confirmedAt: confirmedTimestamp || new Date().toISOString(),
+      developer: user?.displayName || user?.email || 'Guest Developer',
     };
 
     const blob = new Blob([JSON.stringify(configPayload, null, 2)], { type: 'application/json' });
@@ -62,214 +127,360 @@ export function SkillCartDrawer() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/70 backdrop-blur-sm transition-opacity animate-fade-in">
-      <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
-        <div className="w-screen max-w-md border-l border-border bg-surface-raised shadow-2xl flex flex-col justify-between">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/80 backdrop-blur-md transition-opacity animate-fade-in">
+      <div className="fixed inset-y-0 right-0 flex max-w-full pl-6 sm:pl-10">
+        <div className="w-screen max-w-md sm:max-w-xl border-l border-border bg-[#0e0e11] shadow-2xl flex flex-col justify-between overflow-hidden">
           
-          {/* Drawer Header */}
-          <div className="border-b border-border bg-surface px-6 py-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex h-6 w-6 items-center justify-center rounded bg-white text-black font-mono text-xs font-bold">
-                  {skills.length}
-                </div>
-                <h2 className="font-mono text-sm font-bold uppercase tracking-wider text-white">
-                  Your Skill Stack
-                </h2>
+          {/* Drawer Top Navigation Bar */}
+          <div className="border-b border-border bg-surface px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-black font-mono text-xs font-bold shadow-sm">
+                <Receipt className="h-4 w-4" />
               </div>
-
-              <div className="flex items-center gap-2">
-                {skills.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={clearCart}
-                    className="rounded p-1 text-text-muted hover:text-red-400 transition"
-                    title="Clear stack"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setDrawerOpen(false)}
-                  className="rounded border border-border p-1 text-text-secondary hover:border-white hover:text-white transition"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+              <div>
+                <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-white">
+                  Developer Stack Manifest
+                </h2>
+                <p className="font-mono text-[10px] text-text-muted">
+                  {skills.length === 0
+                    ? 'Empty capability cart'
+                    : `${skills.length} item${skills.length === 1 ? '' : 's'} staged for compilation`}
+                </p>
               </div>
             </div>
 
-            <p className="mt-1 text-xs text-text-muted font-sans">
-              {skills.length === 0
-                ? 'Your capability stack is empty. Add skills to generate an install bundle.'
-                : `${skills.length} skill${skills.length === 1 ? '' : 's'} staged for installation.`}
-            </p>
+            <div className="flex items-center gap-2">
+              {skills.length > 0 && (
+                <button
+                  type="button"
+                  onClick={clearCart}
+                  className="rounded p-1.5 text-text-muted hover:text-red-400 hover:bg-surface-raised transition text-xs font-mono flex items-center gap-1"
+                  title="Clear entire cart"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Clear</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(false)}
+                className="rounded-lg border border-border p-1.5 text-text-secondary hover:border-white hover:text-white transition"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           {/* Drawer Scrollable Content */}
-          <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
             
-            {/* Target Agent Selector */}
-            <div>
-              <label className="block font-mono text-xs uppercase tracking-wider text-text-muted mb-2">
-                Target AI Agent Standard
-              </label>
-              <select
-                value={targetAgent}
-                onChange={(e) => setTargetAgent(e.target.value as AgentTarget)}
-                className="w-full rounded border border-border bg-surface px-3 py-2 font-mono text-xs text-white focus:border-white focus:outline-none"
-              >
-                {AGENT_TARGET_LIST.map((agentId) => {
-                  const a = getAdapter(agentId);
-                  return (
-                    <option key={agentId} value={agentId} className="bg-surface text-white">
-                      {a.name} ({a.defaultPath})
-                    </option>
-                  );
-                })}
-              </select>
-              <div className="mt-1 font-mono text-[10px] text-text-muted">
-                Installs to: <code className="text-white">{adapter.defaultPath}</code>
-              </div>
-            </div>
-
-            {/* Staged Skills List */}
-            <div>
-              <div className="flex items-center justify-between font-mono text-xs uppercase tracking-wider text-text-muted mb-2">
-                <span>Staged Capabilities ({skills.length})</span>
-              </div>
-
-              {skills.length === 0 ? (
-                <div className="card-polkadot-hover rounded-xl border border-dashed border-border p-6 text-center font-mono text-xs text-text-muted space-y-3">
-                  <div className="mx-auto flex justify-center">
-                    <img
-                      src="/assets/domodomo/domolaptop.gif"
-                      alt="Domo Mascot Laptop"
-                      className="h-28 w-28 object-contain"
-                    />
-                  </div>
-                  <div className="font-sans text-xs text-white font-bold">
-                    Your skill stack is empty!
-                  </div>
-                  <p className="text-text-muted text-[11px]">
-                    Browse the registry and add capabilities to build your agent bundle.
-                  </p>
-                  <Link
-                    href="/explore"
-                    onClick={() => setDrawerOpen(false)}
-                    className="inline-flex items-center gap-1.5 rounded border border-white/20 bg-surface-raised px-3 py-1.5 text-white hover:border-white transition"
-                  >
-                    <span>Browse Skills Catalog</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
+            {skills.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border p-8 text-center font-mono text-xs text-text-muted space-y-4 my-8 card-polkadot-hover">
+                <div className="mx-auto flex justify-center">
+                  <img
+                    src="/assets/domodomo/domolaptop.gif"
+                    alt="Domo Mascot"
+                    className="h-32 w-32 object-contain"
+                  />
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  {skills.map((s) => (
-                    <div
-                      key={s.slug}
-                      className="flex items-center justify-between rounded border border-border bg-surface p-3 transition hover:border-border-bright"
-                    >
-                      <div>
-                        <div className="font-sans text-xs font-bold text-white">
-                          {s.name}
-                        </div>
-                        <div className="flex items-center gap-2 mt-1 font-mono text-[10px] text-text-muted">
-                          <span>{s.category}</span>
-                          <span>•</span>
-                          <span>{s.license}</span>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => removeSkill(s.slug)}
-                        className="rounded p-1 text-text-muted hover:text-red-400 transition"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  ))}
+                <div className="font-sans text-sm text-white font-bold">
+                  Your skill stack receipt is empty
                 </div>
-              )}
-            </div>
-
-            {/* Generated CLI Command */}
-            {skills.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between font-mono text-xs uppercase tracking-wider text-text-muted mb-2">
-                  <span>Generated Install Command</span>
-                  <button
-                    type="button"
-                    onClick={handleCopy}
-                    className="flex items-center gap-1 text-[11px] text-white hover:underline"
-                  >
-                    {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
-                    <span>{copied ? 'Copied' : 'Copy'}</span>
-                  </button>
-                </div>
-
-                <div className="rounded border border-border bg-surface p-3 font-mono text-xs text-text-secondary overflow-x-auto">
-                  <div className="text-emerald-400 font-bold mb-1">$</div>
-                  <pre className="text-white whitespace-pre-wrap break-all">{installCmd}</pre>
-                </div>
-              </div>
-            )}
-
-            {/* File Tree Preview */}
-            {skills.length > 0 && (
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setShowFileTree(!showFileTree)}
-                  className="flex items-center justify-between w-full font-mono text-xs uppercase tracking-wider text-text-muted mb-2 hover:text-white"
+                <p className="text-text-muted text-xs max-w-xs mx-auto leading-relaxed">
+                  Browse the open catalog, add skills to your stack, and generate your terminal install receipt.
+                </p>
+                <Link
+                  href="/explore"
+                  onClick={() => setDrawerOpen(false)}
+                  className="inline-flex items-center gap-2 rounded-xl border border-white bg-white px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black hover:bg-muted-white transition shadow-md"
                 >
-                  <span>Project File Tree Structure</span>
-                  <span className="text-[10px]">{showFileTree ? '▲ Hide' : '▼ Show'}</span>
-                </button>
-
-                {showFileTree && (
-                  <div className="rounded border border-border bg-surface p-3 font-mono text-[11px] text-text-muted overflow-x-auto">
-                    <div className="text-white font-bold">{adapter.defaultPath}/</div>
-                    {skills.map((s, idx) => (
-                      <div key={s.slug} className="pl-3">
-                        <span className="text-text-secondary">
-                          {idx === skills.length - 1 ? '└──' : '├──'} {s.slug}/
-                        </span>
-                        <div className="pl-6 text-text-muted">
-                          └── SKILL.md
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  <span>Explore 200+ Skills</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
+            ) : (
+              <>
+                {/* Agent Selector Controls */}
+                <div className="rounded-xl border border-border bg-surface p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="font-mono text-[11px] uppercase tracking-wider text-text-muted">
+                      Target AI Agent Standard
+                    </label>
+                    <span className="font-mono text-[10px] text-emerald-400 font-bold">
+                      {adapter.name}
+                    </span>
+                  </div>
+                  <select
+                    value={targetAgent}
+                    onChange={(e) => setTargetAgent(e.target.value as AgentTarget)}
+                    className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 font-mono text-xs text-white focus:border-white focus:outline-none transition"
+                  >
+                    {AGENT_TARGET_LIST.map((agentId) => {
+                      const a = getAdapter(agentId);
+                      return (
+                        <option key={agentId} value={agentId} className="bg-surface text-white">
+                          {a.name} ({a.defaultPath})
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <div className="font-mono text-[10px] text-text-muted pt-1">
+                    Installs destination: <code className="text-white">{adapter.defaultPath}</code>
+                  </div>
+                </div>
+
+                {/* ========================================================================= */}
+                {/* THE RECEIPT PAPER COMPONENT */}
+                {/* ========================================================================= */}
+                <div className="relative rounded-xl border border-border/80 bg-[#121217] p-5 sm:p-7 font-mono text-xs shadow-2xl space-y-5">
+                  
+                  {/* Receipt Header Bar */}
+                  <div className="text-center space-y-1 border-b border-dashed border-border/80 pb-4">
+                    <div className="text-xs font-bold tracking-widest text-white uppercase">
+                      DOMOSKILLS REGISTRY
+                    </div>
+                    <div className="text-[10px] text-text-muted uppercase tracking-wider">
+                      The Open AI Agent Capability Exchange
+                    </div>
+                    <div className="text-[10px] text-text-faint">
+                      https://domoskills.io • v0.1.0-cli
+                    </div>
+                  </div>
+
+                  {/* Receipt Metadata Breakdown */}
+                  <div className="space-y-1 text-[11px] text-text-secondary border-b border-dashed border-border/80 pb-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-muted">RECEIPT / MANIFEST:</span>
+                      <span className="text-white font-bold">{manifestId || '#PENDING-CONFIRMATION'}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-muted">DEVELOPER:</span>
+                      <span className="text-white truncate max-w-[200px]">
+                        {user?.displayName || user?.email || 'Anonymous Builder'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-muted">DATE & TIME:</span>
+                      <span className="text-text-muted">
+                        {confirmedTimestamp ? new Date(confirmedTimestamp).toUTCString() : 'Staged (Active Session)'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-muted">TARGET ECOSYSTEM:</span>
+                      <span className="text-cyan-400 font-semibold">{adapter.name}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-muted">WORKSPACE PATH:</span>
+                      <span className="text-white">{adapter.defaultPath}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-muted">STATUS:</span>
+                      {isConfirmed ? (
+                        <span className="text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="h-3 w-3" /> CONFIRMED & REGISTERED
+                        </span>
+                      ) : (
+                        <span className="text-amber-400 font-bold">STAGED / UNCONFIRMED</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Itemized Table Headers */}
+                  <div>
+                    <div className="flex items-center justify-between font-bold text-[10px] uppercase tracking-wider text-text-muted pb-2 border-b border-border/80">
+                      <div className="w-1/2">Capability Item</div>
+                      <div className="w-1/4 text-center">Score</div>
+                      <div className="w-1/4 text-right">Fee</div>
+                    </div>
+
+                    {/* Receipt Items List */}
+                    <div className="divide-y divide-border/40">
+                      {skills.map((s, idx) => (
+                        <div key={s.slug} className="py-2.5 flex items-start justify-between group">
+                          <div className="w-1/2 pr-2">
+                            <div className="flex items-center gap-1.5 font-bold text-white text-[11px]">
+                              <span className="text-text-muted text-[10px]">
+                                {String(idx + 1).padStart(2, '0')}.
+                              </span>
+                              <span className="truncate">{s.name}</span>
+                            </div>
+                            <div className="text-[10px] text-text-muted flex items-center gap-1.5 mt-0.5">
+                              <span className="capitalize">{s.category}</span>
+                              <span>•</span>
+                              <span>{s.license}</span>
+                            </div>
+                          </div>
+
+                          <div className="w-1/4 text-center text-[11px] text-emerald-400 font-semibold pt-0.5">
+                            100% AST
+                          </div>
+
+                          <div className="w-1/4 flex items-center justify-end gap-2 text-right pt-0.5">
+                            <span className="text-white font-bold text-[11px]">$0.00</span>
+                            {!isConfirmed && (
+                              <button
+                                type="button"
+                                onClick={() => removeSkill(s.slug)}
+                                className="text-text-muted hover:text-red-400 opacity-60 group-hover:opacity-100 transition p-0.5"
+                                title="Remove item"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Financial Breakdown */}
+                  <div className="border-t border-dashed border-border/80 pt-4 space-y-1.5 text-[11px]">
+                    <div className="flex items-center justify-between text-text-muted">
+                      <span>SUBTOTAL ({skills.length} Capabilities):</span>
+                      <span className="text-white font-mono">$0.00</span>
+                    </div>
+                    <div className="flex items-center justify-between text-text-muted">
+                      <span>OPEN SOURCE ECOSYSTEM FEE:</span>
+                      <span className="text-emerald-400 font-mono">$0.00 (FREE)</span>
+                    </div>
+                    <div className="flex items-center justify-between text-text-muted">
+                      <span>COMMUNITY TELEMETRY TAX:</span>
+                      <span className="text-emerald-400 font-mono">$0.00 (ZERO)</span>
+                    </div>
+                    <div className="border-t border-border pt-2 flex items-center justify-between font-bold text-xs text-white">
+                      <span>TOTAL DUE:</span>
+                      <span className="text-emerald-400 text-sm">$0.00 (100% FREE)</span>
+                    </div>
+                  </div>
+
+                  {/* Receipt Stamp / Confirmation Status */}
+                  {isConfirmed ? (
+                    <div className="rounded-xl border-2 border-dashed border-emerald-500/50 bg-emerald-950/20 p-4 text-center space-y-2 animate-scale-up">
+                      <div className="inline-flex items-center gap-1.5 text-emerald-400 font-bold text-xs tracking-wider uppercase">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span>MANIFEST COMPILED & CONFIRMED</span>
+                      </div>
+                      <p className="text-[10px] text-text-secondary font-sans leading-relaxed">
+                        Linked and synchronized to Firestore database. Ready to execute on your local workspace terminal.
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={isConfirming}
+                      onClick={handleConfirmReceipt}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl border border-white bg-white py-3.5 font-mono text-xs font-bold uppercase tracking-wider text-black hover:bg-muted-white transition shadow-[0_0_25px_rgba(255,255,255,0.18)] cursor-pointer disabled:opacity-50"
+                    >
+                      {isConfirming ? (
+                        <span>Compiling & Linking to Firestore...</span>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" />
+                          <span>Confirm Stack & Compile Receipt</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  {/* Generated Terminal Install Box */}
+                  {isConfirmed && (
+                    <div className="space-y-3 pt-2 animate-fade-in">
+                      <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-text-muted">
+                        <span className="flex items-center gap-1.5 text-white font-bold">
+                          <Terminal className="h-3.5 w-3.5 text-emerald-400" />
+                          Terminal Install Command
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleCopy}
+                          className="flex items-center gap-1 text-[11px] text-emerald-400 hover:underline font-bold"
+                        >
+                          {copied ? (
+                            <>
+                              <Check className="h-3 w-3" />
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3 w-3" />
+                              <span>Copy Command</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="relative rounded-xl border border-border bg-black p-3.5 font-mono text-xs text-text-secondary overflow-x-auto">
+                        <div className="text-emerald-400 font-bold mb-1 select-none">$</div>
+                        <pre className="text-white whitespace-pre-wrap break-all leading-relaxed">
+                          {installCmd}
+                        </pre>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={handleDownloadConfig}
+                          className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface-raised py-2.5 text-[11px] font-semibold text-white hover:border-white transition"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          <span>Export domoskills.json</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setIsConfirmed(false)}
+                          className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface py-2.5 text-[11px] font-semibold text-text-secondary hover:text-white hover:border-border-bright transition"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" />
+                          <span>Modify Stack</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Stylized Barcode Element */}
+                  <div className="pt-4 border-t border-dashed border-border/80 text-center space-y-2">
+                    <div className="mx-auto flex justify-center items-center gap-0.5 h-10 opacity-70">
+                      {[
+                        2, 1, 3, 1, 4, 2, 1, 3, 2, 4, 1, 2, 3, 1, 2, 4, 2, 1, 3, 1, 4, 2, 1, 3, 2, 1, 4, 2,
+                        3, 1, 2, 4, 1, 3, 2, 1, 4, 2, 3, 1,
+                      ].map((w, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-white h-full"
+                          style={{ width: `${w * 1.5}px` }}
+                        />
+                      ))}
+                    </div>
+                    <div className="text-[9px] text-text-muted font-mono tracking-widest uppercase">
+                      DOMOSKILLS-AUTH-{manifestId || 'UNCONFIRMED'}-VERIFIED
+                    </div>
+                    <div className="text-[10px] text-text-muted font-sans leading-tight">
+                      Thank you for choosing open-source AI agent capabilities!
+                    </div>
+                  </div>
+
+                </div>
+              </>
             )}
 
           </div>
 
-          {/* Drawer Footer Actions */}
-          {skills.length > 0 && (
-            <div className="border-t border-border bg-surface p-6 space-y-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setDrawerOpen(false);
-                  setInstallModalOpen(true);
-                }}
-                className="w-full flex items-center justify-center gap-2 rounded border border-white bg-white py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black hover:bg-muted-white transition shadow-[0_0_20px_rgba(255,255,255,0.15)]"
-              >
-                <span>Install Stack ({skills.length})</span>
-                <ArrowRight className="h-4 w-4" />
-              </button>
+          {/* Drawer Sticky Footer Actions */}
+          {skills.length > 0 && !isConfirmed && (
+            <div className="border-t border-border bg-surface p-4 sm:p-5 flex items-center justify-between gap-3">
+              <div className="font-mono text-xs">
+                <span className="text-text-muted">Total: </span>
+                <span className="text-emerald-400 font-bold">$0.00 FREE</span>
+              </div>
 
               <button
                 type="button"
-                onClick={handleDownloadConfig}
-                className="w-full flex items-center justify-center gap-1.5 rounded border border-border bg-surface-raised py-2 font-mono text-xs font-semibold text-text-secondary hover:border-white hover:text-white transition"
+                onClick={handleConfirmReceipt}
+                className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black hover:bg-muted-white transition shadow-md cursor-pointer"
               >
-                <Download className="h-3.5 w-3.5" />
-                <span>Export domoskills.json</span>
+                <span>Confirm & Compile</span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
           )}

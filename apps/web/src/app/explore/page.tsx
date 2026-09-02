@@ -14,12 +14,16 @@ import {
   X,
   Filter,
   Eye,
+  Lock,
+  ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { AGENT_TARGET_LIST, getAdapter } from '@domoskills/adapters';
 import { CategorySlug, AgentTarget, TrustLevel, License } from '@domoskills/validators';
 import { SkillCard } from '@/components/skills/SkillCard';
 import { useCartStore } from '@/store/useCartStore';
+import { useAuth } from '@/context/AuthContext';
 
 function ExploreContent() {
   const searchParams = useSearchParams();
@@ -37,6 +41,7 @@ function ExploreContent() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const { addSkill } = useCartStore();
+  const { user, openAuthModal } = useAuth();
 
   const categories = registry.getCategories();
 
@@ -55,8 +60,13 @@ function ExploreContent() {
     });
   }, [query, selectedCategory, selectedAgent, selectedTrust, selectedLicense, hasScriptsOnly, sortBy, visualPreviewOnly]);
 
+  const isLocked = !user && searchResults.skills.length > 10;
+  const visibleSkills = isLocked ? searchResults.skills.slice(0, 10) : searchResults.skills;
+  const lockedCount = Math.max(0, searchResults.skills.length - 10);
+  const teaserSkills = isLocked ? searchResults.skills.slice(10, 12) : [];
+
   const handleAddAllFiltered = () => {
-    for (const skill of searchResults.skills) {
+    for (const skill of visibleSkills) {
       addSkill({
         id: skill.id,
         slug: skill.slug,
@@ -112,7 +122,7 @@ function ExploreContent() {
                 className="inline-flex items-center gap-1.5 rounded border border-border bg-surface px-4 py-2 font-mono text-xs font-semibold text-text-secondary hover:border-white hover:text-white transition"
               >
                 <Plus className="h-3.5 w-3.5" />
-                <span>Add All to Stack ({searchResults.skills.length})</span>
+                <span>Add All to Stack ({visibleSkills.length})</span>
               </button>
             )}
           </div>
@@ -308,7 +318,18 @@ function ExploreContent() {
             {/* Results count banner */}
             <div className="flex items-center justify-between font-mono text-xs text-text-muted">
               <div>
-                Showing <span className="text-white font-bold">{searchResults.skills.length}</span> skill{searchResults.skills.length === 1 ? '' : 's'}
+                {isLocked ? (
+                  <span>
+                    Showing <span className="text-white font-bold">{visibleSkills.length}</span> of{' '}
+                    <span className="text-white font-bold">{searchResults.skills.length}</span> skills{' '}
+                    <span className="text-amber-400 font-semibold">• Preview Mode (First 10 Skills)</span>
+                  </span>
+                ) : (
+                  <span>
+                    Showing <span className="text-white font-bold">{searchResults.skills.length}</span> skill{searchResults.skills.length === 1 ? '' : 's'}
+                    {user && <span className="text-emerald-400 font-semibold ml-2">• ✓ Free Account Active (Full Catalog Unlocked)</span>}
+                  </span>
+                )}
               </div>
               <button
                 type="button"
@@ -336,9 +357,74 @@ function ExploreContent() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {searchResults.skills.map((skill) => (
+                {visibleSkills.map((skill) => (
                   <SkillCard key={skill.slug} skill={skill} />
                 ))}
+
+                {/* Locked Barrier Gate */}
+                {isLocked && (
+                  <>
+                    {/* Blurred teaser preview of subsequent capabilities */}
+                    {teaserSkills.map((skill) => (
+                      <div
+                        key={`teaser-${skill.slug}`}
+                        className="opacity-25 blur-[1.5px] pointer-events-none select-none relative overflow-hidden"
+                      >
+                        <SkillCard skill={skill} />
+                      </div>
+                    ))}
+
+                    {/* Master Unlock Barrier Card */}
+                    <div className="md:col-span-2 rounded-2xl border border-border bg-surface p-8 sm:p-10 text-center space-y-6 shadow-2xl relative overflow-hidden card-polkadot-hover">
+                      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-black shadow-xl">
+                        <Lock className="h-8 w-8 stroke-[2.5]" />
+                      </div>
+
+                      <div className="space-y-2 max-w-xl mx-auto">
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 font-mono text-[11px] text-amber-300 font-bold uppercase tracking-wider">
+                          <span>Developer Catalog Locked</span>
+                        </div>
+
+                        <h3 className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-snug">
+                          Unlock the Full Agent Skills Catalog ({lockedCount}+ Capabilities)
+                        </h3>
+
+                        <p className="font-sans text-xs sm:text-sm text-text-secondary leading-relaxed">
+                          You are currently previewing the first 10 skills. Sign in or create a free account to unlock all {searchResults.skills.length} verified open-source capabilities, build custom agent stacks, and install via terminal CLI.
+                        </p>
+                      </div>
+
+                      {/* CTAs */}
+                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-md mx-auto">
+                        <button
+                          type="button"
+                          onClick={() => openAuthModal('signup')}
+                          className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 rounded-xl border border-white bg-white px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider text-black hover:bg-muted-white transition shadow-lg cursor-pointer"
+                        >
+                          <Sparkles className="h-4 w-4" />
+                          <span>Create Free Account</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => openAuthModal('signin')}
+                          className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-raised px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider text-white hover:border-white hover:bg-surface transition cursor-pointer"
+                        >
+                          <span>Sign In</span>
+                          <ArrowRight className="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      <div className="border-t border-border/60 pt-4 flex flex-wrap items-center justify-center gap-4 text-[11px] font-mono text-text-muted">
+                        <span>✓ 100% Free Forever</span>
+                        <span>•</span>
+                        <span>✓ Zero Credit Card Required</span>
+                        <span>•</span>
+                        <span>✓ Instant CLI Terminal Access</span>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 

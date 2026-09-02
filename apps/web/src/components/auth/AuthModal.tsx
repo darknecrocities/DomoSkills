@@ -48,7 +48,13 @@ export function AuthModal() {
     try {
       await signInWithGoogle();
     } catch (err: any) {
-      setErrorMsg(err.message || 'Google sign-in error.');
+      if (err.code === 'auth/popup-closed-by-user') {
+        setErrorMsg('Google sign-in popup was closed before completing.');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setErrorMsg('Domain not authorized in Firebase Console. Please continue using Email below.');
+      } else {
+        setErrorMsg(err.message || 'Google sign-in error. You can also sign in with email.');
+      }
     }
   };
 
@@ -57,7 +63,11 @@ export function AuthModal() {
     try {
       await signInWithGitHub();
     } catch (err: any) {
-      setErrorMsg(err.message || 'GitHub sign-in error.');
+      if (err.code === 'auth/popup-closed-by-user') {
+        setErrorMsg('GitHub sign-in popup was closed before completing.');
+      } else {
+        setErrorMsg(err.message || 'GitHub sign-in error. You can also sign in with email.');
+      }
     }
   };
 
@@ -250,7 +260,7 @@ export function AuthModal() {
                   <input
                     type="email"
                     required
-                    placeholder="you@developer.com"
+                    placeholder="yourname@domain.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-transparent text-white focus:outline-none placeholder:text-text-faint font-sans text-xs"

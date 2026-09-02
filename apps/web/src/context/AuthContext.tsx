@@ -10,15 +10,21 @@ import {
   onAuthStateChanged,
   User as FirebaseUser,
 } from 'firebase/auth';
-import { auth, googleProvider, githubProvider, isFirebaseConfigured } from '@/lib/firebase';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, googleProvider, githubProvider, db, isFirebaseConfigured } from '@/lib/firebase';
 import { recordUserRegistration } from '@/lib/firestoreMetrics';
 
 export interface AppUser {
   uid: string;
   email: string | null;
   displayName: string | null;
+  username?: string | null;
+  bio?: string | null;
+  githubUrl?: string | null;
   photoURL: string | null;
-  provider: 'google' | 'github' | 'email' | 'demo';
+  provider: 'google' | 'github' | 'email';
+  createdAt?: string;
+  publishedSkillsCount?: number;
 }
 
 interface AuthContextType {
@@ -32,6 +38,7 @@ interface AuthContextType {
   signInWithGitHub: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   signUpWithEmail: (email: string, pass: string, name: string) => Promise<void>;
+  updateUserProfile: (data: Partial<AppUser>) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -45,33 +52,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Listen for real Firebase auth changes
   useEffect(() => {
-    if (!isFirebaseConfigured) {
-      // Check local storage for simulated persistent session
-      const stored = localStorage.getItem('domoskills_demo_user');
-      if (stored) {
-        try {
-          setUser(JSON.parse(stored));
-        } catch {
-          // ignore error
-        }
-      }
-      setLoading(false);
-      return;
-    }
+    // Eradicate any legacy demo or static email user
+    try {
+      localStorage.removeItem('domoskills_demo_user');
+    } catch {}
 
-    const unsubscribe = onAuthStateChanged(auth, (fbUser: FirebaseUser | null) => {
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
       if (fbUser) {
+        // Prevent any legacy static dummy email
+        if (fbUser.email === 'developer@google.com' || fbUser.email === 'developer@gmail.com') {
+          await signOut(auth);
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        let customData: Partial<AppUser> = {};
+        try {
+          const cached = localStorage.getItem(`domoskills_profile_${fbUser.uid}`);
+          if (cached) {
+            customData = JSON.parse(cached);
+          }
+        } catch {}
+
+        if (isFirebaseConfigured && db) {
+          try {
+            const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
+            if (userDoc.exists()) {
+              customData = { ...customData, ...(userDoc.data() as any) };
+            }
+          } catch (err) {
+            console.warn('Could not load remote profile from Firestore:', err);
+          }
+        }
+
         const loggedUser: AppUser = {
           uid: fbUser.uid,
           email: fbUser.email,
-          displayName: fbUser.displayName || fbUser.email?.split('@')[0] || 'Developer',
-          photoURL: fbUser.photoURL,
+          displayName: customData.displayName || fbUser.displayName || fbUser.email?.split('@')[0] || 'Developer',
+          username: customData.username || fbUser.email?.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, ''),
+          bio: customData.bio || null,
+          githubUrl: customData.githubUrl || null,
+          photoURL: customData.photoURL || fbUser.photoURL,
           provider: (fbUser.providerData[0]?.providerId.includes('github')
             ? 'github'
             : fbUser.providerData[0]?.providerId.includes('google')
             ? 'google'
             : 'email') as AppUser['provider'],
+          createdAt: customData.createdAt || new Date().toISOString(),
         };
+
         setUser(loggedUser);
         recordUserRegistration(loggedUser);
       } else {
@@ -93,30 +123,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    if (!isFirebaseConfigured) {
-      const demoUser: AppUser = {
-        uid: `google-${Date.now()}`,
-        email: 'developer@google.com',
-        displayName: 'Google AI Developer',
-        photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-        provider: 'google',
-      };
-      setUser(demoUser);
-      localStorage.setItem('domoskills_demo_user', JSON.stringify(demoUser));
-      recordUserRegistration(demoUser);
-      closeAuthModal();
-      return;
-    }
-
     try {
       const res = await signInWithPopup(auth, googleProvider);
+      const fbUser = res.user;
+      
+      let customData: Partial<AppUser> = {};
+      try {
+        const cached = localStorage.getItem(`domoskills_profile_${fbUser.uid}`);
+        if (cached) customData = JSON.parse(cached);
+      } catch {}
+
       const appUser: AppUser = {
-        uid: res.user.uid,
-        email: res.user.email,
-        displayName: res.user.displayName,
-        photoURL: res.user.photoURL,
+        uid: fbUser.uid,
+        email: fbUser.email,
+        displayName: customData.displayName || fbUser.displayName || fbUser.email?.split('@')[0] || 'Developer',
+        username: customData.username || fbUser.email?.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, ''),
+        bio: customData.bio || null,
+        githubUrl: customData.githubUrl || null,
+        photoURL: customData.photoURL || fbUser.photoURL,
         provider: 'google',
+        createdAt: new Date().toISOString(),
       };
+
       setUser(appUser);
       recordUserRegistration(appUser);
       closeAuthModal();
@@ -127,30 +155,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGitHub = async () => {
-    if (!isFirebaseConfigured) {
-      const demoUser: AppUser = {
-        uid: `github-${Date.now()}`,
-        email: 'octocat@github.com',
-        displayName: 'OpenSource Builder',
-        photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
-        provider: 'github',
-      };
-      setUser(demoUser);
-      localStorage.setItem('domoskills_demo_user', JSON.stringify(demoUser));
-      recordUserRegistration(demoUser);
-      closeAuthModal();
-      return;
-    }
-
     try {
       const res = await signInWithPopup(auth, githubProvider);
+      const fbUser = res.user;
+
+      let customData: Partial<AppUser> = {};
+      try {
+        const cached = localStorage.getItem(`domoskills_profile_${fbUser.uid}`);
+        if (cached) customData = JSON.parse(cached);
+      } catch {}
+
       const appUser: AppUser = {
-        uid: res.user.uid,
-        email: res.user.email,
-        displayName: res.user.displayName,
-        photoURL: res.user.photoURL,
+        uid: fbUser.uid,
+        email: fbUser.email,
+        displayName: customData.displayName || fbUser.displayName || fbUser.email?.split('@')[0] || 'Developer',
+        username: customData.username || fbUser.email?.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, ''),
+        bio: customData.bio || null,
+        githubUrl: customData.githubUrl || null,
+        photoURL: customData.photoURL || fbUser.photoURL,
         provider: 'github',
+        createdAt: new Date().toISOString(),
       };
+
       setUser(appUser);
       recordUserRegistration(appUser);
       closeAuthModal();
@@ -161,30 +187,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithEmail = async (email: string, pass: string) => {
-    if (!isFirebaseConfigured) {
-      const demoUser: AppUser = {
-        uid: `email-${Date.now()}`,
-        email,
-        displayName: email.split('@')[0] || 'Developer',
-        photoURL: null,
-        provider: 'email',
-      };
-      setUser(demoUser);
-      localStorage.setItem('domoskills_demo_user', JSON.stringify(demoUser));
-      recordUserRegistration(demoUser);
-      closeAuthModal();
-      return;
-    }
-
     try {
-      const res = await signInWithEmailAndPassword(auth, email, pass);
+      const res = await signInWithEmailAndPassword(auth, email.trim(), pass);
+      const fbUser = res.user;
+
+      let customData: Partial<AppUser> = {};
+      try {
+        const cached = localStorage.getItem(`domoskills_profile_${fbUser.uid}`);
+        if (cached) customData = JSON.parse(cached);
+      } catch {}
+
       const appUser: AppUser = {
-        uid: res.user.uid,
-        email: res.user.email,
-        displayName: res.user.displayName,
-        photoURL: res.user.photoURL,
+        uid: fbUser.uid,
+        email: fbUser.email || email.trim(),
+        displayName: customData.displayName || fbUser.displayName || email.trim().split('@')[0] || 'Developer',
+        username: customData.username || email.trim().split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, ''),
+        bio: customData.bio || null,
+        githubUrl: customData.githubUrl || null,
+        photoURL: customData.photoURL || fbUser.photoURL,
         provider: 'email',
+        createdAt: new Date().toISOString(),
       };
+
       setUser(appUser);
       recordUserRegistration(appUser);
       closeAuthModal();
@@ -195,33 +219,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUpWithEmail = async (email: string, pass: string, name: string) => {
-    if (!isFirebaseConfigured) {
-      const demoUser: AppUser = {
-        uid: `email-${Date.now()}`,
-        email,
-        displayName: name || email.split('@')[0] || 'Developer',
-        photoURL: null,
-        provider: 'email',
-      };
-      setUser(demoUser);
-      localStorage.setItem('domoskills_demo_user', JSON.stringify(demoUser));
-      recordUserRegistration(demoUser);
-      closeAuthModal();
-      return;
-    }
-
     try {
-      const res = await createUserWithEmailAndPassword(auth, email, pass);
-      if (name) {
-        await updateProfile(res.user, { displayName: name });
+      const res = await createUserWithEmailAndPassword(auth, email.trim(), pass);
+      const fbUser = res.user;
+
+      if (name.trim()) {
+        await updateProfile(fbUser, { displayName: name.trim() });
       }
+
       const appUser: AppUser = {
-        uid: res.user.uid,
-        email: res.user.email,
-        displayName: name || res.user.displayName,
-        photoURL: res.user.photoURL,
+        uid: fbUser.uid,
+        email: fbUser.email || email.trim(),
+        displayName: name.trim() || fbUser.displayName || email.trim().split('@')[0] || 'Developer',
+        username: (name.trim() || email.trim().split('@')[0]).toLowerCase().replace(/[^a-z0-9_]/g, ''),
+        bio: null,
+        githubUrl: null,
+        photoURL: fbUser.photoURL,
         provider: 'email',
+        createdAt: new Date().toISOString(),
       };
+
       setUser(appUser);
       recordUserRegistration(appUser);
       closeAuthModal();
@@ -231,12 +248,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = async () => {
-    if (isFirebaseConfigured) {
-      await signOut(auth);
+  const updateUserProfile = async (data: Partial<AppUser>) => {
+    if (!user) throw new Error('No authenticated user found');
+
+    const updatedUser: AppUser = {
+      ...user,
+      ...data,
+      displayName: data.displayName !== undefined ? data.displayName : user.displayName,
+      username: data.username !== undefined ? data.username : user.username,
+      bio: data.bio !== undefined ? data.bio : user.bio,
+      githubUrl: data.githubUrl !== undefined ? data.githubUrl : user.githubUrl,
+      photoURL: data.photoURL !== undefined ? data.photoURL : user.photoURL,
+    };
+
+    if (auth.currentUser) {
+      if (data.displayName || data.photoURL) {
+        await updateProfile(auth.currentUser, {
+          displayName: updatedUser.displayName,
+          photoURL: updatedUser.photoURL,
+        });
+      }
     }
+
+    if (isFirebaseConfigured && db) {
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        await setDoc(
+          userDocRef,
+          {
+            displayName: updatedUser.displayName,
+            username: updatedUser.username || null,
+            bio: updatedUser.bio || null,
+            githubUrl: updatedUser.githubUrl || null,
+            photoURL: updatedUser.photoURL || null,
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
+      } catch (err) {
+        console.warn('Firestore profile sync warning:', err);
+      }
+    }
+
+    // Save locally for instant persistence
+    try {
+      localStorage.setItem(`domoskills_profile_${user.uid}`, JSON.stringify(updatedUser));
+    } catch {}
+
+    setUser(updatedUser);
+  };
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch {}
     setUser(null);
-    localStorage.removeItem('domoskills_demo_user');
+    try {
+      localStorage.removeItem('domoskills_demo_user');
+    } catch {}
   };
 
   return (
@@ -252,6 +321,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithGitHub,
         signInWithEmail,
         signUpWithEmail,
+        updateUserProfile,
         logout,
       }}
     >

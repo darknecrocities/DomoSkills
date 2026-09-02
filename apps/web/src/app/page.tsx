@@ -27,6 +27,7 @@ import { InteractiveTerminal } from '@/components/terminal/InteractiveTerminal';
 import { SkillCard } from '@/components/skills/SkillCard';
 import { DomoMascot } from '@/components/mascot/DomoMascot';
 import { AgentBeltCarousel } from '@/components/brands/AgentBeltCarousel';
+import { HeroSearch } from '@/components/home/HeroSearch';
 import { useLiveTelemetry } from '@/lib/firestoreMetrics';
 import { useGitHubStars } from '@/lib/useGitHubStars';
 
@@ -41,7 +42,6 @@ const TYPEWRITER_PHRASES = [
 export default function HomePage() {
   const router = useRouter();
   const [wordIndex, setWordIndex] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
   const { formattedVisits, formattedUsers, formattedInstalls } = useLiveTelemetry();
   const { formattedStars } = useGitHubStars();
 
@@ -86,15 +86,6 @@ export default function HomePage() {
   const trendingSkills = registry.getTrendingSkills(6);
   const stats = registry.getStats();
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      router.push('/explore');
-    }
-  };
-
   return (
     <div className="relative overflow-hidden">
       
@@ -138,25 +129,8 @@ export default function HomePage() {
                 Discover, curate, and install verified open-source capabilities for your AI coding agents in a single CLI command.
               </p>
 
-              {/* Search Bar */}
-              <form onSubmit={handleSearchSubmit} className="max-w-xl">
-                <div className="relative flex items-center rounded-xl border border-border bg-surface p-1.5 transition focus-within:border-white focus-within:ring-1 focus-within:ring-white shadow-lg">
-                  <Search className="ml-3 h-4 w-4 text-text-muted" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search 1,000+ skills (e.g., 'react', 'owasp', 'docker', 'rag')..."
-                    className="w-full bg-transparent px-3 py-2 font-mono text-xs sm:text-sm text-white placeholder:text-text-muted focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    className="rounded-lg bg-white px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-black transition hover:bg-muted-white shrink-0 shadow-md"
-                  >
-                    Search
-                  </button>
-                </div>
-              </form>
+              {/* Hero Search with Live Keyword Autocomplete */}
+              <HeroSearch />
 
               {/* Action Buttons & Fast Stats */}
               <div className="flex flex-wrap items-center gap-4 pt-2 font-mono text-xs">

@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      domoskills:
+        specifier: workspace:*
+        version: link:packages/cli
       turbo:
         specifier: ^2.4.4
         version: 2.10.12
