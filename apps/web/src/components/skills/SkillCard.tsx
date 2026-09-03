@@ -2,20 +2,43 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Plus, Check, X, Star, Shield, ShieldCheck, AlertTriangle, ArrowUpRight, Eye } from 'lucide-react';
+import {
+  Plus,
+  Check,
+  X,
+  Star,
+  Shield,
+  ShieldCheck,
+  AlertTriangle,
+  ArrowUpRight,
+  Eye,
+  Scale,
+  Terminal,
+  FileCode2,
+} from 'lucide-react';
 import { Skill } from '@domoskills/validators';
 import { useCartStore } from '@/store/useCartStore';
+import { useComparatorStore } from '@/store/useComparatorStore';
 import { useSkillStars } from '@/lib/useSkillStars';
 import { useAuth } from '@/context/AuthContext';
 import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
 
 interface SkillCardProps {
   skill: Skill;
+  onOpenCommandBuilder?: (skill: Skill) => void;
+  onOpenScorecard?: (skill: Skill) => void;
+  onOpenPromptGen?: (skill: Skill) => void;
 }
 
-export function SkillCard({ skill }: SkillCardProps) {
+export function SkillCard({
+  skill,
+  onOpenCommandBuilder,
+  onOpenScorecard,
+  onOpenPromptGen,
+}: SkillCardProps) {
   const [mounted, setMounted] = React.useState(false);
   const { hasSkill, toggleSkill } = useCartStore();
+  const { toggleCompare, hasSkill: hasCompare } = useComparatorStore();
   const { user, openAuthModal } = useAuth();
   const baselineStars = skill.sourceRepository?.stars || 0;
   const { isStarred, formattedStars, toggleStar } = useSkillStars(skill.slug, baselineStars);
@@ -25,6 +48,7 @@ export function SkillCard({ skill }: SkillCardProps) {
   }, []);
 
   const isSelected = mounted ? hasSkill(skill.slug) : false;
+  const isCompared = mounted ? hasCompare(skill.slug) : false;
 
   const handleAddClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -52,30 +76,39 @@ export function SkillCard({ skill }: SkillCardProps) {
     });
   };
 
+  const handleCompareClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleCompare(skill.slug);
+  };
 
   const getTrustBadge = () => {
-    switch (skill.trustLevel) {
-      case 'Official':
-        return (
-          <span className="inline-flex items-center gap-1 rounded border border-white/30 bg-white text-black px-1.5 py-0.5 text-[10px] font-mono font-bold uppercase">
-            <ShieldCheck className="h-3 w-3" />
-            Official
-          </span>
-        );
-      case 'Verified':
-        return (
-          <span className="inline-flex items-center gap-1 rounded border border-border bg-surface-raised text-white px-1.5 py-0.5 text-[10px] font-mono font-semibold uppercase">
-            <Shield className="h-3 w-3" />
-            Verified
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center gap-1 rounded border border-border bg-surface text-text-muted px-1.5 py-0.5 text-[10px] font-mono uppercase">
-            Community
-          </span>
-        );
-    }
+    const badgeContent = skill.trustLevel === 'Official' ? (
+      <span className="inline-flex items-center gap-1 rounded border border-white/30 bg-white text-black px-1.5 py-0.5 text-[10px] font-mono font-bold uppercase">
+        <ShieldCheck className="h-3 w-3" />
+        Official
+      </span>
+    ) : (
+      <span className="inline-flex items-center gap-1 rounded border border-border bg-surface-raised text-white px-1.5 py-0.5 text-[10px] font-mono font-semibold uppercase">
+        <Shield className="h-3 w-3" />
+        Verified
+      </span>
+    );
+
+    return (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onOpenScorecard?.(skill);
+        }}
+        title="Inspect Security Scorecard"
+        className="cursor-pointer hover:opacity-80 transition"
+      >
+        {badgeContent}
+      </button>
+    );
   };
 
   return (
@@ -98,7 +131,24 @@ export function SkillCard({ skill }: SkillCardProps) {
               </span>
             )}
           </div>
-          <div>{getTrustBadge()}</div>
+
+          <div className="flex items-center gap-1.5">
+            {/* Compare Button */}
+            <button
+              type="button"
+              onClick={handleCompareClick}
+              title={isCompared ? 'Remove from Compare' : 'Compare Skill'}
+              className={`p-1 rounded text-xs font-mono transition cursor-pointer ${
+                isCompared
+                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/50'
+                  : 'text-text-muted hover:text-white hover:bg-surface-raised'
+              }`}
+            >
+              <Scale className="h-3.5 w-3.5" />
+            </button>
+
+            {getTrustBadge()}
+          </div>
         </div>
 
         {/* Visual Preview Image (for UI & Design Skills) */}
@@ -171,31 +221,64 @@ export function SkillCard({ skill }: SkillCardProps) {
           </span>
         </div>
 
-        {/* Add / Remove Button */}
-        <button
-          type="button"
-          onClick={handleAddClick}
-          title={isSelected ? 'Click to remove from stack' : 'Add to stack'}
-          className={`group/btn flex items-center gap-1.5 rounded border px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
-            isSelected
-              ? 'border-border bg-surface-raised text-white hover:border-red-500/60 hover:bg-red-500/10 hover:text-red-400'
-              : 'border-border bg-surface-raised text-white hover:border-white hover:bg-white hover:text-black'
-          }`}
-        >
-          {isSelected ? (
-            <>
-              <Check className="h-3.5 w-3.5 text-emerald-400 group-hover/btn:hidden" />
-              <X className="h-3.5 w-3.5 text-red-400 hidden group-hover/btn:inline" />
-              <span className="group-hover/btn:hidden">Stacked</span>
-              <span className="hidden group-hover/btn:inline text-red-400">Remove</span>
-            </>
-          ) : (
-            <>
-              <Plus className="h-3.5 w-3.5" />
-              <span>Add</span>
-            </>
+        {/* Quick Tools & Add Button */}
+        <div className="flex items-center gap-1.5">
+          {onOpenCommandBuilder && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onOpenCommandBuilder(skill);
+              }}
+              title="CLI Command Builder"
+              className="p-1.5 rounded border border-border bg-surface text-text-muted hover:text-white hover:border-white transition cursor-pointer"
+            >
+              <Terminal className="h-3.5 w-3.5" />
+            </button>
           )}
-        </button>
+
+          {onOpenPromptGen && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onOpenPromptGen(skill);
+              }}
+              title="Zero-Install Prompt Directive Generator"
+              className="p-1.5 rounded border border-border bg-surface text-text-muted hover:text-white hover:border-white transition cursor-pointer"
+            >
+              <FileCode2 className="h-3.5 w-3.5" />
+            </button>
+          )}
+
+          {/* Add / Remove Button */}
+          <button
+            type="button"
+            onClick={handleAddClick}
+            title={isSelected ? 'Click to remove from stack' : 'Add to stack'}
+            className={`group/btn flex items-center gap-1.5 rounded border px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition cursor-pointer ${
+              isSelected
+                ? 'border-border bg-surface-raised text-white hover:border-red-500/60 hover:bg-red-500/10 hover:text-red-400'
+                : 'border-border bg-surface-raised text-white hover:border-white hover:bg-white hover:text-black'
+            }`}
+          >
+            {isSelected ? (
+              <>
+                <Check className="h-3.5 w-3.5 text-emerald-400 group-hover/btn:hidden" />
+                <X className="h-3.5 w-3.5 text-red-400 hidden group-hover/btn:inline" />
+                <span className="group-hover/btn:hidden">Stacked</span>
+                <span className="hidden group-hover/btn:inline text-red-400">Remove</span>
+              </>
+            ) : (
+              <>
+                <Plus className="h-3.5 w-3.5" />
+                <span>Add</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
     </div>

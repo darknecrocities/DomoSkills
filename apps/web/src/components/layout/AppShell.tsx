@@ -12,6 +12,8 @@ import { AuthProvider } from '@/context/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
 import { recordVisit } from '@/lib/firestoreMetrics';
 import { CartFlyAnimation } from '../cart/CartFlyAnimation';
+import { ABTestOverlay } from '../testing/ABTestOverlay';
+import { SkillComparatorDrawer } from '../comparison/SkillComparatorDrawer';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -49,6 +51,8 @@ export function AppShell({ children }: AppShellProps) {
           isOpen={commandPaletteOpen}
           onClose={() => setCommandPaletteOpen(false)}
         />
+        <SkillComparatorDrawer />
+        <ABTestOverlay />
       </div>
     </AuthProvider>
   );

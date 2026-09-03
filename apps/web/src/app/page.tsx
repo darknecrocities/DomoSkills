@@ -23,8 +23,17 @@ import {
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { AGENT_ADAPTERS, AGENT_TARGET_LIST } from '@domoskills/adapters';
+import { Skill } from '@domoskills/validators';
 import { InteractiveTerminal } from '@/components/terminal/InteractiveTerminal';
 import { SkillCard } from '@/components/skills/SkillCard';
+import { SkillCardCompact } from '@/components/skills/SkillCardCompact';
+import { SkillCardListRow } from '@/components/skills/SkillCardListRow';
+import { GridLayoutSwitch } from '@/components/skills/GridLayoutSwitch';
+import { useViewModeStore } from '@/store/useViewModeStore';
+import { CuratedBundlesSection } from '@/components/home/CuratedBundlesSection';
+import { CommandBuilderModal } from '@/components/terminal/CommandBuilderModal';
+import { SkillSecurityScorecardModal } from '@/components/skills/SkillSecurityScorecardModal';
+import { AgentPromptGeneratorModal } from '@/components/skills/AgentPromptGeneratorModal';
 import { DomoMascot } from '@/components/mascot/DomoMascot';
 import { AgentBeltCarousel } from '@/components/brands/AgentBeltCarousel';
 import { HeroSearch } from '@/components/home/HeroSearch';
@@ -49,6 +58,50 @@ export default function HomePage() {
   const [typewriterText, setTypewriterText] = useState('');
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const { viewMode } = useViewModeStore();
+  const [selectedCmdSkill, setSelectedCmdSkill] = useState<Skill | null>(null);
+  const [selectedScorecardSkill, setSelectedScorecardSkill] = useState<Skill | null>(null);
+  const [selectedPromptSkill, setSelectedPromptSkill] = useState<Skill | null>(null);
+
+  const gridClass =
+    viewMode === 'dense'
+      ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'
+      : viewMode === 'list'
+      ? 'flex flex-col gap-2.5'
+      : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6';
+
+  const renderSkillItem = (skill: Skill) => {
+    if (viewMode === 'dense') {
+      return (
+        <SkillCardCompact
+          key={skill.slug}
+          skill={skill}
+          onOpenCommandBuilder={setSelectedCmdSkill}
+          onOpenScorecard={setSelectedScorecardSkill}
+        />
+      );
+    }
+    if (viewMode === 'list') {
+      return (
+        <SkillCardListRow
+          key={skill.slug}
+          skill={skill}
+          onOpenCommandBuilder={setSelectedCmdSkill}
+          onOpenScorecard={setSelectedScorecardSkill}
+        />
+      );
+    }
+    return (
+      <SkillCard
+        key={skill.slug}
+        skill={skill}
+        onOpenCommandBuilder={setSelectedCmdSkill}
+        onOpenScorecard={setSelectedScorecardSkill}
+        onOpenPromptGen={setSelectedPromptSkill}
+      />
+    );
+  };
 
   // Cycle hero keywords smoothly
   useEffect(() => {
@@ -237,6 +290,15 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================================= */}
+      {/* 3.5 CURATED BUNDLES (STARTER PACKS) */}
+      {/* ========================================================================= */}
+      <section className="border-b border-border py-16 bg-transparent">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <CuratedBundlesSection />
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
       {/* 4. TRENDING SKILLS */}
       {/* ========================================================================= */}
       <section className="border-b border-border py-20 bg-transparent tech-grid-bg">
@@ -252,19 +314,20 @@ export default function HomePage() {
                 Trending Agent Skills
               </h2>
             </div>
-            <Link
-              href="/explore"
-              className="font-mono text-xs text-text-secondary hover:text-white flex items-center gap-1 group"
-            >
-              <span>Explore full registry</span>
-              <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition" />
-            </Link>
+            <div className="flex items-center gap-3">
+              <GridLayoutSwitch />
+              <Link
+                href="/explore"
+                className="font-mono text-xs text-text-secondary hover:text-white flex items-center gap-1 group"
+              >
+                <span>Explore full registry</span>
+                <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition" />
+              </Link>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trendingSkills.map((skill) => (
-              <SkillCard key={skill.slug} skill={skill} />
-            ))}
+          <div className={gridClass}>
+            {trendingSkills.map((skill) => renderSkillItem(skill))}
           </div>
 
         </div>
@@ -445,6 +508,21 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Dynamic Modals */}
+      <CommandBuilderModal
+        skill={selectedCmdSkill}
+        onClose={() => setSelectedCmdSkill(null)}
+      />
+
+      <SkillSecurityScorecardModal
+        skill={selectedScorecardSkill}
+        onClose={() => setSelectedScorecardSkill(null)}
+      />
+
+      <AgentPromptGeneratorModal
+        skill={selectedPromptSkill}
+        onClose={() => setSelectedPromptSkill(null)}
+      />
     </div>
   );
 }

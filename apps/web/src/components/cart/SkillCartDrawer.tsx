@@ -29,6 +29,7 @@ import { useAuth } from '@/context/AuthContext';
 import { AGENT_TARGET_LIST, getAdapter, generateInstallCommand } from '@domoskills/adapters';
 import { AgentTarget, CategorySlug, TrustLevel } from '@domoskills/validators';
 import { recordStackReceipt, getUserStackHistory, StackReceiptData } from '@/lib/firestoreMetrics';
+import { MultiFormatExportModal } from './MultiFormatExportModal';
 
 export function SkillCartDrawer() {
   const {
@@ -53,6 +54,7 @@ export function SkillCartDrawer() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [manifestId, setManifestId] = useState('');
   const [confirmedTimestamp, setConfirmedTimestamp] = useState('');
+  const [isMultiExportOpen, setIsMultiExportOpen] = useState(false);
 
   // Load stack history whenever drawer opens or user changes
   useEffect(() => {
@@ -670,11 +672,11 @@ export function SkillCartDrawer() {
                         <div className="grid grid-cols-2 gap-2 pt-1">
                           <button
                             type="button"
-                            onClick={() => handleDownloadConfig()}
+                            onClick={() => setIsMultiExportOpen(true)}
                             className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface-raised py-2.5 text-[11px] font-semibold text-white hover:border-white transition cursor-pointer"
                           >
                             <Download className="h-3.5 w-3.5" />
-                            <span>Export domoskills.json</span>
+                            <span>Export Formats</span>
                           </button>
 
                           <button
@@ -737,6 +739,15 @@ export function SkillCartDrawer() {
               </button>
             </div>
           )}
+
+          {/* Multi-Format Export Modal */}
+          <MultiFormatExportModal
+            skills={skills}
+            targetAgent={targetAgent}
+            manifestId={manifestId || 'DOMO-STACK'}
+            isOpen={isMultiExportOpen}
+            onClose={() => setIsMultiExportOpen(false)}
+          />
 
         </div>
       </div>

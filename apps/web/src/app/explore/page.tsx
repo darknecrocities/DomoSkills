@@ -22,8 +22,15 @@ import {
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { AGENT_TARGET_LIST, getAdapter } from '@domoskills/adapters';
-import { CategorySlug, AgentTarget, TrustLevel, License } from '@domoskills/validators';
+import { Skill, CategorySlug, AgentTarget, TrustLevel, License } from '@domoskills/validators';
 import { SkillCard } from '@/components/skills/SkillCard';
+import { SkillCardCompact } from '@/components/skills/SkillCardCompact';
+import { SkillCardListRow } from '@/components/skills/SkillCardListRow';
+import { GridLayoutSwitch } from '@/components/skills/GridLayoutSwitch';
+import { useViewModeStore } from '@/store/useViewModeStore';
+import { CommandBuilderModal } from '@/components/terminal/CommandBuilderModal';
+import { SkillSecurityScorecardModal } from '@/components/skills/SkillSecurityScorecardModal';
+import { AgentPromptGeneratorModal } from '@/components/skills/AgentPromptGeneratorModal';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuth } from '@/context/AuthContext';
 import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
@@ -47,6 +54,11 @@ function ExploreContent() {
 
   const { addSkill } = useCartStore();
   const { user, openAuthModal } = useAuth();
+  const { viewMode } = useViewModeStore();
+
+  const [selectedCmdSkill, setSelectedCmdSkill] = useState<Skill | null>(null);
+  const [selectedScorecardSkill, setSelectedScorecardSkill] = useState<Skill | null>(null);
+  const [selectedPromptSkill, setSelectedPromptSkill] = useState<Skill | null>(null);
 
   const categories = registry.getCategories();
 
@@ -140,6 +152,45 @@ function ExploreContent() {
     }
   };
 
+  const gridClass =
+    viewMode === 'dense'
+      ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'
+      : viewMode === 'list'
+      ? 'flex flex-col gap-2.5'
+      : 'grid grid-cols-1 md:grid-cols-2 gap-6';
+
+  const renderSkillItem = (skill: Skill) => {
+    if (viewMode === 'dense') {
+      return (
+        <SkillCardCompact
+          key={skill.slug}
+          skill={skill}
+          onOpenCommandBuilder={setSelectedCmdSkill}
+          onOpenScorecard={setSelectedScorecardSkill}
+        />
+      );
+    }
+    if (viewMode === 'list') {
+      return (
+        <SkillCardListRow
+          key={skill.slug}
+          skill={skill}
+          onOpenCommandBuilder={setSelectedCmdSkill}
+          onOpenScorecard={setSelectedScorecardSkill}
+        />
+      );
+    }
+    return (
+      <SkillCard
+        key={skill.slug}
+        skill={skill}
+        onOpenCommandBuilder={setSelectedCmdSkill}
+        onOpenScorecard={setSelectedScorecardSkill}
+        onOpenPromptGen={setSelectedPromptSkill}
+      />
+    );
+  };
+
   const handleResetFilters = () => {
     setQuery('');
     setSelectedCategory('all');
@@ -177,17 +228,21 @@ function ExploreContent() {
               </h1>
             </div>
 
-            {/* Add All Button */}
-            {searchResults.skills.length > 0 && (
-              <button
-                type="button"
-                onClick={handleAddAllFiltered}
-                className="inline-flex items-center gap-1.5 rounded border border-border bg-surface px-4 py-2 font-mono text-xs font-semibold text-text-secondary hover:border-white hover:text-white transition"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Add All to Stack ({visibleSkills.length})</span>
-              </button>
-            )}
+            {/* Toolbar: Grid Density Switch & Add All Button */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              <GridLayoutSwitch />
+
+              {searchResults.skills.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleAddAllFiltered}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-4 py-2 font-mono text-xs font-semibold text-text-secondary hover:border-white hover:text-white transition cursor-pointer"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Add All ({visibleSkills.length})</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Search Input Bar */}
@@ -460,17 +515,13 @@ function ExploreContent() {
 
                       {/* 10 Skills Grid */}
                       {isCatLocked ? (
-                        <div className="opacity-20 blur-[2px] pointer-events-none select-none grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {previewSkills.slice(0, 2).map((skill) => (
-                            <SkillCard key={skill.slug} skill={skill} />
-                          ))}
+                        <div className={`opacity-20 blur-[2px] pointer-events-none select-none ${gridClass}`}>
+                          {previewSkills.slice(0, 2).map((skill) => renderSkillItem(skill))}
                         </div>
                       ) : (
                         <>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {previewSkills.map((skill) => (
-                              <SkillCard key={skill.slug} skill={skill} />
-                            ))}
+                          <div className={gridClass}>
+                            {previewSkills.map((skill) => renderSkillItem(skill))}
                           </div>
 
                           {/* Category Expand Footer Bar */}
@@ -550,10 +601,8 @@ function ExploreContent() {
                 </div>
               ) : (
                 <div className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {paginatedSkills.map((skill) => (
-                      <SkillCard key={skill.slug} skill={skill} />
-                    ))}
+                  <div className={gridClass}>
+                    {paginatedSkills.map((skill) => renderSkillItem(skill))}
                   </div>
 
                   {/* Pagination Controls Bar */}
@@ -679,6 +728,22 @@ function ExploreContent() {
         </div>
 
       </div>
+
+      {/* Dynamic Capability Modals */}
+      <CommandBuilderModal
+        skill={selectedCmdSkill}
+        onClose={() => setSelectedCmdSkill(null)}
+      />
+
+      <SkillSecurityScorecardModal
+        skill={selectedScorecardSkill}
+        onClose={() => setSelectedScorecardSkill(null)}
+      />
+
+      <AgentPromptGeneratorModal
+        skill={selectedPromptSkill}
+        onClose={() => setSelectedPromptSkill(null)}
+      />
     </div>
   );
 }

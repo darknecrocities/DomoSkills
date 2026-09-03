@@ -23,16 +23,23 @@ import {
   AlertTriangle,
   Eye,
   Trash2,
+  Scale,
+  FileCode2,
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { AGENT_TARGET_LIST, getAdapter, generateInstallCommand } from '@domoskills/adapters';
 import { AgentTarget } from '@domoskills/validators';
 import { useCartStore } from '@/store/useCartStore';
+import { useComparatorStore } from '@/store/useComparatorStore';
 import { useSkillStars } from '@/lib/useSkillStars';
 import { useAuth } from '@/context/AuthContext';
 import { FileTreeViewer } from '@/components/skills/FileTreeViewer';
 import { recordDownload } from '@/lib/firestoreMetrics';
 import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
+import { SkillDependencyGraph } from '@/components/skills/SkillDependencyGraph';
+import { CommandBuilderModal } from '@/components/terminal/CommandBuilderModal';
+import { SkillSecurityScorecardModal } from '@/components/skills/SkillSecurityScorecardModal';
+import { AgentPromptGeneratorModal } from '@/components/skills/AgentPromptGeneratorModal';
 
 export default function SkillDetailPage() {
   const params = useParams();
@@ -46,6 +53,7 @@ export default function SkillDetailPage() {
 
   const [mounted, setMounted] = useState(false);
   const { targetAgent, hasSkill, toggleSkill, setTargetAgent } = useCartStore();
+  const { toggleCompare, hasSkill: hasCompare } = useComparatorStore();
   const baselineStars = skill.sourceRepository?.stars || 0;
   const { isStarred, formattedStars, toggleStar } = useSkillStars(skill.slug, baselineStars);
   
@@ -55,7 +63,12 @@ export default function SkillDetailPage() {
 
   const activeAgent = mounted ? targetAgent : 'universal';
   const isSelected = mounted ? hasSkill(skill.slug) : false;
+  const isCompared = mounted ? hasCompare(skill.slug) : false;
   const [copied, setCopied] = useState(false);
+
+  const [cmdBuilderOpen, setCmdBuilderOpen] = useState(false);
+  const [promptGenOpen, setPromptGenOpen] = useState(false);
+  const [scorecardOpen, setScorecardOpen] = useState(false);
   const [promptCopied, setPromptCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'preview' | 'instructions' | 'files' | 'attribution' | 'compatibility'>(
     skill.previewImage ? 'preview' : 'instructions'
@@ -246,6 +259,43 @@ export default function SkillDetailPage() {
                   <span>GitHub</span>
                   <ExternalLink className="h-3 w-3 ml-0.5 text-text-muted" />
                 </a>
+              </div>
+
+              {/* Quick Feature Tools */}
+              <div className="grid grid-cols-3 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setCmdBuilderOpen(true)}
+                  className="flex flex-col items-center justify-center p-2 rounded-lg border border-border bg-surface hover:border-white hover:bg-surface-raised transition font-mono text-[10px] text-text-secondary hover:text-white cursor-pointer"
+                  title="Configure Terminal Flags"
+                >
+                  <Terminal className="h-3.5 w-3.5 mb-0.5 text-emerald-400" />
+                  <span>CLI Flags</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPromptGenOpen(true)}
+                  className="flex flex-col items-center justify-center p-2 rounded-lg border border-border bg-surface hover:border-white hover:bg-surface-raised transition font-mono text-[10px] text-text-secondary hover:text-white cursor-pointer"
+                  title="Zero-Install Prompt Directive"
+                >
+                  <FileCode2 className="h-3.5 w-3.5 mb-0.5 text-cyan-400" />
+                  <span>Prompt</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => toggleCompare(skill.slug)}
+                  className={`flex flex-col items-center justify-center p-2 rounded-lg border transition font-mono text-[10px] cursor-pointer ${
+                    isCompared
+                      ? 'border-cyan-500 bg-cyan-950/60 text-cyan-300 font-bold'
+                      : 'border-border bg-surface hover:border-white hover:bg-surface-raised text-text-secondary hover:text-white'
+                  }`}
+                  title="Compare with other skills"
+                >
+                  <Scale className="h-3.5 w-3.5 mb-0.5 text-purple-400" />
+                  <span>{isCompared ? 'Comparing' : 'Compare'}</span>
+                </button>
               </div>
 
               {/* Safety guarantee */}
@@ -568,7 +618,28 @@ export default function SkillDetailPage() {
 
         </div>
 
+        {/* Ecosystem Radar & Companion Skills */}
+        <div className="mt-8">
+          <SkillDependencyGraph skill={skill} />
+        </div>
+
       </div>
+
+      {/* Dynamic Modals */}
+      <CommandBuilderModal
+        skill={cmdBuilderOpen ? skill : null}
+        onClose={() => setCmdBuilderOpen(false)}
+      />
+
+      <SkillSecurityScorecardModal
+        skill={scorecardOpen ? skill : null}
+        onClose={() => setScorecardOpen(false)}
+      />
+
+      <AgentPromptGeneratorModal
+        skill={promptGenOpen ? skill : null}
+        onClose={() => setPromptGenOpen(false)}
+      />
     </div>
   );
 }

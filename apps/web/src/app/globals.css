@@ -18,6 +18,7 @@
     color-scheme: dark;
     background-color: #050505;
     color: #ffffff;
+    overflow-x: hidden;
   }
 
   body {
