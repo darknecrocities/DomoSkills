@@ -488,9 +488,9 @@ export default function HomePage() {
 
               {/* Live Registry Sync Footnote */}
               <div className="pt-3 border-t border-border/60 flex flex-wrap items-center gap-4 text-[11px] font-mono text-text-muted">
-                <div className="flex items-center gap-1.5 text-emerald-400">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="font-bold">Registry Sync: Online</span>
+                <div className="flex items-center gap-1.5 text-text-secondary">
+                  <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
+                  <span className="font-bold">Registry Engine v1.0</span>
                 </div>
                 <div>• {formattedUsers} Developers</div>
                 <div>• {formattedInstalls} Installs</div>

@@ -36,9 +36,9 @@ export function Footer() {
               Discover modular skills, stack capabilities, and install directly into your project in seconds.
             </p>
             <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-text-muted">
-              <div className="inline-flex items-center gap-2 rounded border border-border bg-surface px-3 py-1.5">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Registry Sync: Active</span>
+              <div className="inline-flex items-center gap-2 rounded border border-border bg-surface px-3 py-1.5 text-text-muted">
+                <span className="h-1.5 w-1.5 rounded-full bg-white/40"></span>
+                <span>Registry Core v1.0</span>
               </div>
               <a
                 href="https://github.com/darknecrocities/DomoSkills"

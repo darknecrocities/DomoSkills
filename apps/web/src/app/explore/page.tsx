@@ -294,11 +294,11 @@ function ExploreContent() {
             }}
             className={`px-3 py-1.5 rounded border whitespace-nowrap transition flex items-center gap-1.5 cursor-pointer ${
               visualPreviewOnly
-                ? 'border-emerald-400 bg-emerald-950/60 text-emerald-300 font-bold'
+                ? 'border-white bg-white text-black font-bold'
                 : 'border-border bg-surface text-text-secondary hover:text-white hover:border-border-bright'
             }`}
           >
-            <Eye className="h-3.5 w-3.5 text-emerald-400" />
+            <Eye className="h-3.5 w-3.5" />
             <span>UI Design Previews ({registry.getAllSkills().filter((s) => Boolean(s.previewImage)).length})</span>
           </button>
           {categories.map((cat) => {

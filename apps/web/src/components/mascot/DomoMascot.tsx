@@ -65,7 +65,7 @@ export function DomoMascot({
       {(showBubble || isHovered) && (
         <div className="absolute -top-14 z-20 whitespace-nowrap rounded-lg border border-white/20 bg-surface-raised px-3.5 py-2 font-mono text-xs font-semibold text-white shadow-2xl animate-fade-in backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="h-1.5 w-1.5 rounded-full bg-white/50"></span>
             <span>{moodQuotes[clickMood]}</span>
           </div>
           {/* Bubble tail */}

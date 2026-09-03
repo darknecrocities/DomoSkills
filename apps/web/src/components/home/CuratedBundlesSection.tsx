@@ -44,8 +44,8 @@ export function CuratedBundlesSection() {
             <span className="font-mono text-xs font-bold uppercase tracking-widest text-text-muted">
               Starter Packs
             </span>
-            <span className="rounded border border-emerald-500/40 bg-emerald-950/40 px-2 py-0.5 font-mono text-[10px] text-emerald-400 font-bold">
-              1-Click Compilation
+            <span className="rounded border border-border bg-surface px-2 py-0.5 font-mono text-[10px] text-text-secondary font-semibold">
+              1-Click Stacks
             </span>
           </div>
           <h2 className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-1">
@@ -77,7 +77,7 @@ export function CuratedBundlesSection() {
                   <span className="rounded border border-border bg-surface-raised px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-text-muted">
                     {bundle.badge}
                   </span>
-                  <span className="font-mono text-[10px] text-emerald-400 font-bold">
+                  <span className="font-mono text-[10px] text-text-muted font-medium">
                     {bundle.skillSlugs.length} Skills
                   </span>
                 </div>
