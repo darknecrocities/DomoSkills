@@ -36,18 +36,21 @@ export function Footer() {
               Discover modular skills, stack capabilities, and install directly into your project in seconds.
             </p>
             <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-text-muted">
-              <div className="inline-flex items-center gap-2 rounded border border-border bg-surface px-3 py-1.5 text-text-muted">
-                <span className="h-1.5 w-1.5 rounded-full bg-white/40"></span>
-                <span>Registry Core v1.0</span>
+              <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-text-muted">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                <span>Open Source Index • MIT</span>
               </div>
               <a
                 href="https://github.com/darknecrocities/DomoSkills"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-1.5 text-text-secondary hover:text-white hover:border-white transition"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-text-secondary hover:text-white hover:border-white transition"
               >
                 <Github className="h-3.5 w-3.5 text-text-secondary" />
-                <span suppressHydrationWarning>★ {formattedStars} Stars</span>
+                <span suppressHydrationWarning className="flex items-center gap-1">
+                  <Star className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" />
+                  {formattedStars} Stars
+                </span>
               </a>
             </div>
           </div>

@@ -175,8 +175,8 @@ export function HeroSearch() {
               setSelectedIndex(-1);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Search keywords (e.g., 'react', 'owasp', 'docker', 'rag')..."
-            className="w-full bg-transparent px-3 py-2 font-mono text-xs sm:text-sm text-white placeholder:text-text-muted focus:outline-none"
+            placeholder="Search 135+ agent skills..."
+            className="w-full bg-transparent px-2 sm:px-3 py-2 font-mono text-xs sm:text-sm text-white placeholder:text-text-muted focus:outline-none min-w-0"
           />
 
           {query && (
@@ -186,7 +186,8 @@ export function HeroSearch() {
                 setQuery('');
                 setSelectedIndex(-1);
               }}
-              className="p-1.5 text-text-muted hover:text-white transition mr-1"
+              className="p-1.5 text-text-muted hover:text-white transition mr-1 shrink-0"
+              aria-label="Clear search"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -194,7 +195,7 @@ export function HeroSearch() {
 
           <button
             type="submit"
-            className="rounded-lg bg-white px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-black transition hover:bg-muted-white shrink-0 shadow-md cursor-pointer"
+            className="rounded-lg bg-white px-3 sm:px-5 py-2 font-mono text-xs font-bold uppercase tracking-wider text-black transition hover:bg-muted-white shrink-0 shadow-md cursor-pointer"
           >
             Search
           </button>

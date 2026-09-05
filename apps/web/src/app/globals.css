@@ -167,6 +167,63 @@
   animation-play-state: paused;
 }
 
+/* Infinite Wavy Starter Packs Carousel */
+@keyframes wavyCarouselMarquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-wavy-marquee {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: wavyCarouselMarquee 65s linear infinite;
+}
+
+.carousel-paused .animate-wavy-marquee,
+.animate-wavy-marquee.is-paused {
+  animation-play-state: paused !important;
+}
+
+.animate-wavy-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Wavy motion & orientation keyframe (~ symbol sine wave) */
+@keyframes wavyMotionOrient {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-16px) rotate(-3.2deg);
+  }
+  50% {
+    transform: translateY(0px) rotate(0.4deg);
+  }
+  75% {
+    transform: translateY(16px) rotate(3.2deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+.animate-wavy-card {
+  will-change: transform;
+  animation: wavyMotionOrient 6.5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+.carousel-paused .animate-wavy-card,
+.animate-wavy-card.is-paused {
+  animation-play-state: paused !important;
+}
+
+
 /* Text Shimmer Sweep Animation */
 @keyframes textShimmer {
   0% {
@@ -218,8 +275,11 @@ code, pre, kbd {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .animate-belt-marquee {
+  .animate-belt-marquee,
+  .animate-wavy-marquee,
+  .animate-wavy-card {
     animation: none !important;
+    transform: none !important;
   }
 }
 

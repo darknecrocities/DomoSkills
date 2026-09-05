@@ -509,7 +509,7 @@ export default function SettingsPage() {
                             {s.name}
                           </Link>
                           <div className="font-mono text-[10px] text-text-muted mt-0.5">
-                            <code>{s.slug}</code> • v{s.version}
+                            <code>{s.slug}</code>
                           </div>
                         </div>
 

@@ -56,6 +56,12 @@ export function SkillCartDrawer() {
   const [confirmedTimestamp, setConfirmedTimestamp] = useState('');
   const [isMultiExportOpen, setIsMultiExportOpen] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Load stack history whenever drawer opens or user changes
   useEffect(() => {
     if (isDrawerOpen && user) {
@@ -75,7 +81,7 @@ export function SkillCartDrawer() {
     }
   }, [skills.length]);
 
-  if (!isDrawerOpen) return null;
+  if (!mounted || !isDrawerOpen) return null;
 
   const adapter = getAdapter(targetAgent);
   const skillSlugs = skills.map((s) => s.slug);
@@ -548,7 +554,7 @@ export function SkillCartDrawer() {
                         The Open AI Agent Capability Exchange
                       </div>
                       <div className="text-[10px] text-text-faint">
-                        https://domoskills.io • v0.1.0-cli
+                        https://domoskills.io • CLI Edition
                       </div>
                     </div>
 
@@ -631,7 +637,10 @@ export function SkillCartDrawer() {
                       </div>
                       <div className="flex justify-between text-text-muted">
                         <span>Install Verification:</span>
-                        <span className="text-emerald-400 font-bold">✓ 100% SHA256 Verified</span>
+                        <span className="text-emerald-400 font-bold inline-flex items-center gap-1">
+                          <Check className="h-3 w-3" />
+                          <span>SHA256 Verified</span>
+                        </span>
                       </div>
                     </div>
 

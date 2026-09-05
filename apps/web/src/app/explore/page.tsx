@@ -440,7 +440,13 @@ function ExploreContent() {
                   <span>
                     Catalog Overview: <span className="text-white font-bold">{categories.length}</span> Domains •{' '}
                     <span className="text-white font-bold">{searchResults.skills.length}</span> Total Skills
-                    {user && <span className="text-emerald-400 font-semibold ml-2">• ✓ Full Access Unlocked</span>}
+                    {user && (
+                      <span className="text-emerald-400 font-semibold ml-2 inline-flex items-center gap-1">
+                        <span>•</span>
+                        <Check className="h-3 w-3" />
+                        <span>Full Access Unlocked</span>
+                      </span>
+                    )}
                   </span>
                 ) : isLocked ? (
                   <span>
@@ -456,7 +462,13 @@ function ExploreContent() {
                     </span>{' '}
                     of <span className="text-white font-bold">{searchResults.skills.length}</span> skills{' '}
                     <span className="text-text-faint">• Page {currentPage} of {totalPages}</span>
-                    {user && <span className="text-emerald-400 font-semibold ml-2">• ✓ Full Access Unlocked</span>}
+                    {user && (
+                      <span className="text-emerald-400 font-semibold ml-2 inline-flex items-center gap-1">
+                        <span>•</span>
+                        <Check className="h-3 w-3" />
+                        <span>Full Access Unlocked</span>
+                      </span>
+                    )}
                   </span>
                 )}
               </div>

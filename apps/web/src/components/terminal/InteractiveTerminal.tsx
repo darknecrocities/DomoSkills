@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Copy, Check, Terminal as TerminalIcon, Sparkles } from 'lucide-react';
+import { Copy, Check, Terminal as TerminalIcon, Sparkles, CheckCircle2, Info } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { recordDownload } from '@/lib/firestoreMetrics';
 
@@ -29,10 +29,10 @@ export function InteractiveTerminal({
       output: [
         'DOMOSKILLS_ — The Open Agent Skills Registry',
         '[info] Resolving 2 skills for Universal Agent (.agent/skills)...',
-        '[ok] Installed React Performance (react-performance) v1.4.2 [MIT]',
+        '[ok] Installed React Performance (react-performance) [MIT]',
         '  > Location: .agent/skills/react-performance',
         '  > Source: domoskills/official-agent-skills (7f9a12c)',
-        '[ok] Installed OWASP Top 10 Security Guardian (owasp-agent-guardian) v3.0.1 [MIT]',
+        '[ok] Installed OWASP Top 10 Security Guardian (owasp-agent-guardian) [MIT]',
         '  > Location: .agent/skills/owasp-agent-guardian',
         '  > Source: security-guardians/agent-security-skills (9e1a82b)',
         '',
@@ -127,8 +127,8 @@ export function InteractiveTerminal({
       case 'doctor':
         outputLines = [
           'DomoSkills Diagnostic Doctor',
-          '[ok] Node.js runtime detected: v24.13.0',
-          '[ok] Git detected: git version 2.45.1',
+          '[ok] Node.js runtime detected: Active [OK]',
+          '[ok] Git detected: Ready [OK]',
           '[ok] Agent workspace detected: OpenCode & Cursor (.agent/skills)',
           '[ok] Universal Agent Configuration: Active',
           '[ok] All diagnostics passed. Ready for skills.',
@@ -153,9 +153,9 @@ export function InteractiveTerminal({
       case 'ls':
         outputLines = [
           'Installed Skills in .agent/skills:',
-          '  * react-performance          v1.4.2 [MIT]',
-          '  * owasp-agent-guardian       v3.0.1 [MIT]',
-          '  * rag-pipeline-architect     v2.2.0 [MIT]',
+          '  * react-performance          [MIT • Verified]',
+          '  * owasp-agent-guardian       [MIT • Official]',
+          '  * rag-pipeline-architect     [MIT • Official]',
         ];
         break;
       case 'clear':
@@ -262,9 +262,9 @@ export function InteractiveTerminal({
             
             <div className="space-y-1 text-text-muted">
               <div className="text-white font-bold">DOMOSKILLS_ — The Open Agent Skills Registry</div>
-              <div className="text-cyan-400">ℹ Resolving 2 skills for Universal Agent...</div>
-              <div className="text-emerald-400">✔ react-performance <span className="text-text-muted">[v1.4.2 • MIT • Verified]</span></div>
-              <div className="text-emerald-400">✔ owasp-agent-guardian <span className="text-text-muted">[v3.0.1 • MIT • Official]</span></div>
+              <div className="text-cyan-400 flex items-center gap-1.5"><Info className="h-3 w-3 shrink-0" /><span>Resolving 2 skills for Universal Agent...</span></div>
+              <div className="text-emerald-400 flex items-center gap-1.5"><Check className="h-3 w-3 shrink-0" /><span>react-performance <span className="text-text-muted">[MIT • Verified]</span></span></div>
+              <div className="text-emerald-400 flex items-center gap-1.5"><Check className="h-3 w-3 shrink-0" /><span>owasp-agent-guardian <span className="text-text-muted">[MIT • Official]</span></span></div>
               <div className="py-2 text-text-secondary">
                 <span className="text-white font-bold">Installed successfully into target workspace:</span>
                 <pre className="mt-1 text-text-muted text-[11px] leading-relaxed">
@@ -277,7 +277,8 @@ export function InteractiveTerminal({
                 </pre>
               </div>
               <div className="text-white font-semibold flex items-center gap-2">
-                <span className="text-emerald-400">✔</span> Agent capability stack synchronized.
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                <span>Agent capability stack synchronized.</span>
                 <span className="inline-block h-3.5 w-1.5 bg-white animate-cursor-blink"></span>
               </div>
             </div>

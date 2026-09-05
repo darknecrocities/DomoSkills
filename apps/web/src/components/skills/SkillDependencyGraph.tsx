@@ -104,7 +104,17 @@ export function SkillDependencyGraph({ skill }: SkillDependencyGraphProps) {
                         : 'bg-white text-black hover:bg-muted-white'
                     }`}
                   >
-                    {isStacked ? '✓ Stacked' : '+ Add'}
+                    {isStacked ? (
+                      <span className="inline-flex items-center gap-1">
+                        <Check className="h-3 w-3" />
+                        <span>Stacked</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1">
+                        <Plus className="h-3 w-3" />
+                        <span>Add</span>
+                      </span>
+                    )}
                   </button>
                 </div>
               );

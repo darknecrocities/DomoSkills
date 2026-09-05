@@ -15,6 +15,7 @@ import {
   ArrowRight,
   ExternalLink,
   Code2,
+  Star,
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { useComparatorStore } from '@/store/useComparatorStore';
@@ -24,9 +25,16 @@ import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
 import { AGENT_TARGET_LIST, getAdapter } from '@domoskills/adapters';
 
 export function SkillComparatorDrawer() {
+  const [mounted, setMounted] = React.useState(false);
   const { compareSlugs, removeFromCompare, clearCompare, isOpen, setOpen } = useComparatorStore();
   const { addSkill, hasSkill } = useCartStore();
   const { user, openAuthModal } = useAuth();
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   const skills = compareSlugs
     .map((slug) => registry.getSkillBySlug(slug))
@@ -54,18 +62,19 @@ export function SkillComparatorDrawer() {
     <>
       {/* Bottom Floating Compare Dock */}
       {!isOpen && (
-        <aside aria-label="Skill Comparison Dock" className="fixed bottom-4 right-4 z-40 animate-slide-up">
-          <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-[#0d0d12]/95 p-3 font-mono text-xs shadow-[0_12px_36px_rgba(0,0,0,0.8),0_0_24px_rgba(255,255,255,0.08)] backdrop-blur-xl">
+        <aside aria-label="Skill Comparison Dock" className="fixed bottom-4 right-4 z-40 animate-slide-up max-w-[calc(100vw-32px)]">
+          {/* Desktop Version */}
+          <div className="hidden sm:flex items-center gap-3 rounded-2xl border border-white/20 bg-[#0d0d12]/95 p-3 font-mono text-xs shadow-[0_12px_36px_rgba(0,0,0,0.8),0_0_24px_rgba(255,255,255,0.08)] backdrop-blur-xl">
             <div className="flex items-center gap-2">
               <Scale className="h-4 w-4 text-cyan-400 shrink-0" />
-              <span className="font-bold text-white hidden sm:inline">Compare Mode:</span>
+              <span className="font-bold text-white">Compare Mode:</span>
               <span className="rounded bg-cyan-950/80 px-1.5 py-0.5 text-[10px] text-cyan-300 font-bold border border-cyan-800/60">
                 {skills.length}/3
               </span>
             </div>
 
             {/* Mini pills of selected skills */}
-            <div className="flex items-center gap-1.5 max-w-[200px] sm:max-w-xs overflow-x-auto scrollbar-none">
+            <div className="flex items-center gap-1.5 max-w-xs overflow-x-auto scrollbar-none">
               {skills.map((s) => (
                 <span
                   key={s.slug}
@@ -104,6 +113,27 @@ export function SkillComparatorDrawer() {
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>
+          </div>
+
+          {/* Mobile Version: Compact Floating Pill */}
+          <div className="flex sm:hidden items-center gap-2 rounded-full border border-white/25 bg-[#0d0d12]/95 px-3.5 py-2 shadow-2xl backdrop-blur-xl font-mono text-xs">
+            <Scale className="h-4 w-4 text-cyan-400 shrink-0" />
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="font-bold text-white flex items-center gap-1.5"
+            >
+              <span>Compare ({skills.length})</span>
+              <ArrowRight className="h-3 w-3 text-cyan-300" />
+            </button>
+            <button
+              type="button"
+              onClick={clearCompare}
+              className="p-1 text-text-muted hover:text-white ml-1"
+              aria-label="Clear compare"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           </div>
         </aside>
       )}
@@ -209,7 +239,10 @@ export function SkillComparatorDrawer() {
 
                         <div className="flex items-center justify-between">
                           <span className="text-text-muted">STARS:</span>
-                          <span className="text-amber-400 font-bold">★ {skill.sourceRepository?.stars.toLocaleString() || '0'}</span>
+                          <span className="text-amber-400 font-bold inline-flex items-center gap-1">
+                            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                            {skill.sourceRepository?.stars.toLocaleString() || '0'}
+                          </span>
                         </div>
 
                         <div className="flex items-center justify-between">

@@ -17,6 +17,7 @@ import {
   List,
   Scale,
   Download,
+  Star,
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { useCartStore } from '@/store/useCartStore';
@@ -227,7 +228,10 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-[11px] text-text-muted group-hover:text-white shrink-0 ml-2">
-                    <span>★ {skill.sourceRepository?.stars.toLocaleString() || '0'}</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                      {skill.sourceRepository?.stars.toLocaleString() || '0'}
+                    </span>
                     <CornerDownLeft className="h-3 w-3 opacity-0 group-hover:opacity-100 transition" />
                   </div>
                 </button>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ShoppingBag, Menu, X, Github, User, LogOut, Sparkles, Layers, ChevronDown, Star, Settings } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuth } from '@/context/AuthContext';
@@ -20,10 +21,19 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
   const { formattedStars } = useGitHubStars();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [hoveredHref, setHoveredHref] = useState<string | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Trigger top route switch progress sweep animation on page change
+  useEffect(() => {
+    setIsNavigating(true);
+    const timer = setTimeout(() => setIsNavigating(false), 450);
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
   const cartCount = mounted ? skills.length : 0;
   const currentUser = mounted ? user : null;
@@ -36,6 +46,19 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/90 backdrop-blur-md">
+      {/* Top Page Switch Glow Progress Bar */}
+      <AnimatePresence>
+        {isNavigating && (
+          <motion.div
+            initial={{ scaleX: 0, opacity: 1, transformOrigin: '0% 50%' }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-400 via-white to-emerald-400 z-50 shadow-[0_0_10px_rgba(255,255,255,0.7)] pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
+
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         
         {/* Logo with DomoDomo App Icon */}
@@ -53,22 +76,70 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
             </div>
           </Link>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Desktop Nav Links with Gliding Spring Pill Animation */}
+          <nav
+            onMouseLeave={() => setHoveredHref(null)}
+            className="hidden md:flex items-center gap-1 p-1 rounded-xl border border-border/80 bg-surface/80 backdrop-blur-md"
+          >
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
+              const isHovered = hoveredHref === link.href;
+
               return (
                 <Link
                   key={link.href}
                   href={link.href}
                   prefetch={true}
-                  className={`px-3 py-1.5 font-mono text-xs font-medium uppercase tracking-wider transition rounded ${
-                    isActive
-                      ? 'bg-surface-active text-white border border-border-bright'
-                      : 'text-text-secondary hover:text-white hover:bg-surface-raised'
-                  }`}
+                  onMouseEnter={() => setHoveredHref(link.href)}
+                  className="relative px-3.5 py-1.5 font-mono text-xs font-medium uppercase tracking-wider rounded-lg transition-colors group"
                 >
-                  {link.label}
+                  {/* Gliding Active Pill */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-active-pill"
+                      transition={{
+                        type: 'spring',
+                        stiffness: 420,
+                        damping: 32,
+                      }}
+                      className="absolute inset-0 rounded-lg bg-surface-active border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.08)] z-0"
+                    />
+                  )}
+
+                  {/* Active Bottom Glow Accent Line */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-active-glow"
+                      transition={{
+                        type: 'spring',
+                        stiffness: 420,
+                        damping: 32,
+                      }}
+                      className="absolute -bottom-[1px] left-2.5 right-2.5 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent z-10"
+                    />
+                  )}
+
+                  {/* Subtle Hover Highlight when inactive */}
+                  {isHovered && !isActive && (
+                    <motion.div
+                      layoutId="navbar-hover-pill"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute inset-0 rounded-lg bg-surface-raised/70 border border-border/50 z-0"
+                    />
+                  )}
+
+                  <span
+                    className={`relative z-10 transition-colors duration-200 ${
+                      isActive
+                        ? 'text-white font-bold'
+                        : 'text-text-secondary group-hover:text-white'
+                    }`}
+                  >
+                    {link.label}
+                  </span>
                 </Link>
               );
             })}
@@ -76,7 +147,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
         </div>
 
         {/* Right Action Bar */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           
           {/* Quick Search Shortcut Trigger */}
           <button
@@ -95,7 +166,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
           <button
             type="button"
             onClick={onOpenCommandPalette}
-            className="flex sm:hidden p-2 rounded border border-border text-text-secondary hover:text-white hover:bg-surface-raised"
+            className="flex sm:hidden p-1.5 rounded border border-border text-text-secondary hover:text-white hover:bg-surface-raised"
             aria-label="Search"
           >
             <Search className="h-4 w-4" />
@@ -122,7 +193,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
             id="navbar-cart-btn"
             type="button"
             onClick={() => setDrawerOpen(!isDrawerOpen)}
-            className={`relative flex items-center gap-2 rounded border px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition ${
+            className={`relative flex items-center gap-1.5 sm:gap-2 rounded border px-2.5 sm:px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider transition ${
               cartCount > 0
                 ? 'border-white bg-white text-black hover:bg-muted-white shadow-[0_0_15px_rgba(255,255,255,0.2)]'
                 : 'border-border bg-surface text-text-secondary hover:border-border-bright hover:text-white'
@@ -220,68 +291,86 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="border-b border-border bg-surface-raised px-4 py-4 md:hidden animate-fade-in">
-          <div className="flex flex-col gap-2 font-mono text-xs">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                prefetch={true}
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 uppercase tracking-wider text-text-secondary hover:bg-surface hover:text-white rounded"
-              >
-                {link.label}
-              </Link>
-            ))}
-            {!currentUser ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  openAuthModal('signin');
-                }}
-                className="flex items-center gap-2 px-3 py-2 text-left uppercase tracking-wider text-emerald-400 hover:bg-surface rounded font-bold"
-              >
-                <User className="h-4 w-4" />
-                <span>Sign In / Register</span>
-              </button>
-            ) : (
-              <>
-                <Link
-                  href="/settings"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 uppercase tracking-wider text-cyan-400 hover:bg-surface rounded font-bold"
-                >
-                  <Settings className="h-4 w-4" />
-                  <span>Profile & Settings</span>
-                </Link>
+      {/* Mobile Drawer Menu with Fluid Slide/Fade Transition */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="border-b border-border bg-surface-raised px-4 py-4 md:hidden overflow-hidden"
+          >
+            <div className="flex flex-col gap-1.5 font-mono text-xs">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    prefetch={true}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center justify-between px-3 py-2 uppercase tracking-wider rounded-lg transition-colors ${
+                      isActive
+                        ? 'bg-surface-active text-white font-bold border border-white/20 shadow-sm'
+                        : 'text-text-secondary hover:bg-surface hover:text-white'
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                    {isActive && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                    )}
+                  </Link>
+                );
+              })}
+              {!currentUser ? (
                 <button
                   type="button"
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    logout();
+                    openAuthModal('signin');
                   }}
-                  className="flex items-center gap-2 px-3 py-2 text-left uppercase tracking-wider text-red-400 hover:bg-surface rounded font-bold"
+                  className="flex items-center gap-2 px-3 py-2 text-left uppercase tracking-wider text-emerald-400 hover:bg-surface rounded-lg font-bold transition-colors"
                 >
-                  <LogOut className="h-4 w-4" />
-                  <span>Log Out ({currentUser.displayName})</span>
+                  <User className="h-4 w-4" />
+                  <span>Sign In / Register</span>
                 </button>
-              </>
-            )}
-            <a
-              href="https://github.com/darknecrocities/DomoSkills"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 uppercase tracking-wider text-text-secondary hover:bg-surface hover:text-white rounded"
-            >
-              <Github className="h-4 w-4" />
-              <span>GitHub Repository</span>
-            </a>
-          </div>
-        </div>
-      )}
+              ) : (
+                <>
+                  <Link
+                    href="/settings"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 uppercase tracking-wider text-cyan-400 hover:bg-surface rounded-lg font-bold transition-colors"
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span>Profile & Settings</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      logout();
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-left uppercase tracking-wider text-red-400 hover:bg-surface rounded-lg font-bold transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Log Out ({currentUser.displayName})</span>
+                  </button>
+                </>
+              )}
+              <a
+                href="https://github.com/darknecrocities/DomoSkills"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 uppercase tracking-wider text-text-secondary hover:bg-surface hover:text-white rounded-lg transition-colors"
+              >
+                <Github className="h-4 w-4" />
+                <span>GitHub Repository</span>
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

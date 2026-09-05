@@ -74,17 +74,17 @@ export function MultiFormatExportModal({
 
 set -e
 
-echo "🚀 Installing DomoSkills capability stack [${manifestId}]..."
+echo "==> Installing DomoSkills capability stack [${manifestId}]..."
 
 # Ensure npx / node is available
 if ! command -v npx &> /dev/null; then
-    echo "❌ Error: npx is required to install DomoSkills."
+    echo "[error] npx is required to install DomoSkills."
     exit 1
 fi
 
 npx domoskills add ${skillSlugs.join(' ')} --agent ${targetAgent}
 
-echo "✔ Successfully installed ${skills.length} skills into ${adapter.defaultPath}!"
+echo "[ok] Successfully installed ${skills.length} skills into ${adapter.defaultPath}!"
 `,
         };
 

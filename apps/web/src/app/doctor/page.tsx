@@ -103,16 +103,22 @@ capabilities:
             <div className="rounded border border-border bg-surface-raised p-4 space-y-2">
               <div className="flex items-center justify-between text-text-muted">
                 <span>Node.js Runtime</span>
-                <span className="text-emerald-400 font-bold">✔ OK</span>
+                <span className="text-emerald-400 font-bold inline-flex items-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Ready</span>
+                </span>
               </div>
-              <div className="text-white font-bold text-sm">v18.0.0+ Compatible</div>
+              <div className="text-white font-bold text-sm">Node.js Engine Compatible</div>
               <div className="text-text-muted text-[11px]">Supports modern ESM & worker threads</div>
             </div>
 
             <div className="rounded border border-border bg-surface-raised p-4 space-y-2">
               <div className="flex items-center justify-between text-text-muted">
                 <span>Git System</span>
-                <span className="text-emerald-400 font-bold">✔ OK</span>
+                <span className="text-emerald-400 font-bold inline-flex items-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Ready</span>
+                </span>
               </div>
               <div className="text-white font-bold text-sm">Safe Git Submodules</div>
               <div className="text-text-muted text-[11px]">Enables shallow downloads of verified repositories</div>
@@ -121,7 +127,10 @@ capabilities:
             <div className="rounded border border-border bg-surface-raised p-4 space-y-2">
               <div className="flex items-center justify-between text-text-muted">
                 <span>Security Sandboxing</span>
-                <span className="text-emerald-400 font-bold">✔ ACTIVE</span>
+                <span className="text-emerald-400 font-bold inline-flex items-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Active</span>
+                </span>
               </div>
               <div className="text-white font-bold text-sm">Path Traversal Block</div>
               <div className="text-text-muted text-[11px]">Zero arbitrary script auto-execution</div>

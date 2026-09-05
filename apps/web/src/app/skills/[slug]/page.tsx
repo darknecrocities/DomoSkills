@@ -116,7 +116,6 @@ export default function SkillDetailPage() {
                 <span className="rounded border border-border px-2 py-0.5 text-text-secondary">
                   {skill.license} License
                 </span>
-                <span className="text-text-muted">v{skill.version}</span>
                 {skill.trustLevel === 'Official' ? (
                   <span className="inline-flex items-center gap-1 rounded border border-white/30 bg-white text-black px-2 py-0.5 text-[11px] font-bold">
                     <ShieldCheck className="h-3.5 w-3.5" /> Official
