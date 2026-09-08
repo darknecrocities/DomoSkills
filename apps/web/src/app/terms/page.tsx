@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   FileText,
@@ -19,14 +19,7 @@ import {
 
 export default function TermsPage() {
   const [copied, setCopied] = useState(false);
-
-  const handleCopyLink = () => {
-    if (typeof window !== 'undefined') {
-      navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
+  const [activeSection, setActiveSection] = useState<string>('overview');
 
   const sections = [
     { id: 'overview', title: '1. Acceptance of Terms' },
@@ -42,9 +35,48 @@ export default function TermsPage() {
     { id: 'contact', title: '11. Community Governance & Contact' },
   ];
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 160;
+      for (const section of sections) {
+        const el = document.getElementById(section.id);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveSection(section.id);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleCopyLink = () => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveSection(id);
+      window.history.pushState(null, '', `#${id}`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background py-12">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         
         {/* Top Breadcrumb & Actions */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
@@ -140,25 +172,38 @@ export default function TermsPage() {
           </div>
         </div>
 
-        {/* Main Content Layout with Sticky TOC */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+        {/* Main Content Layout with Sticky Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           
-          {/* Sticky Table of Contents */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-xl border border-border bg-surface p-4 space-y-3 font-mono text-xs">
-              <div className="font-bold text-white uppercase tracking-wider text-[11px] pb-2 border-b border-border">
-                On This Page
+          {/* Sticky Table of Contents Sidebar */}
+          <aside className="lg:col-span-4 sticky top-24 self-start z-10">
+            <div className="rounded-xl border border-border bg-surface/95 backdrop-blur-md p-4 space-y-3 font-mono text-xs max-h-[calc(100vh-8rem)] overflow-y-auto shadow-xl">
+              <div className="flex items-center justify-between pb-2 border-b border-border">
+                <span className="font-bold text-white uppercase tracking-wider text-[11px]">
+                  On This Page
+                </span>
+                <span className="text-[10px] text-text-muted">
+                  {sections.length} Sections
+                </span>
               </div>
-              <nav className="space-y-1.5">
-                {sections.map((sec) => (
-                  <a
-                    key={sec.id}
-                    href={`#${sec.id}`}
-                    className="block text-text-muted hover:text-white transition truncate py-0.5"
-                  >
-                    {sec.title}
-                  </a>
-                ))}
+              <nav className="space-y-1">
+                {sections.map((sec) => {
+                  const isActive = activeSection === sec.id;
+                  return (
+                    <a
+                      key={sec.id}
+                      href={`#${sec.id}`}
+                      onClick={(e) => scrollToSection(e, sec.id)}
+                      className={`block py-1.5 px-2.5 rounded-lg transition text-xs leading-snug ${
+                        isActive
+                          ? 'bg-white/10 text-white font-bold border-l-2 border-cyan-400 pl-2 shadow-sm'
+                          : 'text-text-secondary hover:text-white hover:bg-surface-raised'
+                      }`}
+                    >
+                      {sec.title}
+                    </a>
+                  );
+                })}
               </nav>
               <div className="pt-3 border-t border-border">
                 <Link
@@ -169,13 +214,13 @@ export default function TermsPage() {
                 </Link>
               </div>
             </div>
-          </div>
+          </aside>
 
           {/* Legal Text Sections */}
-          <div className="lg:col-span-3 space-y-12 font-sans text-sm text-text-secondary leading-relaxed">
+          <main className="lg:col-span-8 space-y-12 font-sans text-sm text-text-secondary leading-relaxed">
             
             {/* Section 1 */}
-            <section id="overview" className="scroll-mt-24 space-y-3">
+            <section id="overview" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">1.</span> Acceptance of Terms
               </h2>
@@ -190,7 +235,7 @@ export default function TermsPage() {
             </section>
 
             {/* Section 2 */}
-            <section id="services" className="scroll-mt-24 space-y-3">
+            <section id="services" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">2.</span> Description of Service
               </h2>
@@ -207,7 +252,7 @@ export default function TermsPage() {
             </section>
 
             {/* Section 3 */}
-            <section id="open-source" className="scroll-mt-24 space-y-3">
+            <section id="open-source" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">3.</span> Open Source & Licensing
               </h2>
@@ -225,7 +270,7 @@ export default function TermsPage() {
             </section>
 
             {/* Section 4 */}
-            <section id="installation" className="scroll-mt-24 space-y-3">
+            <section id="installation" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">4.</span> Installation & Zero-Execution Model
               </h2>
@@ -244,7 +289,7 @@ export default function TermsPage() {
             </section>
 
             {/* Section 5 */}
-            <section id="acceptable-use" className="scroll-mt-24 space-y-3">
+            <section id="acceptable-use" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">5.</span> Acceptable Use & Submissions
               </h2>
@@ -262,7 +307,7 @@ export default function TermsPage() {
             </section>
 
             {/* Section 6 */}
-            <section id="intellectual-property" className="scroll-mt-24 space-y-3">
+            <section id="intellectual-property" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">6.</span> Intellectual Property Rights
               </h2>
@@ -275,7 +320,7 @@ export default function TermsPage() {
             </section>
 
             {/* Section 7 */}
-            <section id="ast-auditing" className="scroll-mt-24 space-y-3">
+            <section id="ast-auditing" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">7.</span> Security Scanning & Quarantine
               </h2>
@@ -294,7 +339,7 @@ export default function TermsPage() {
             </section>
 
             {/* Section 8 */}
-            <section id="disclaimer" className="scroll-mt-24 space-y-3">
+            <section id="disclaimer" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">8.</span> Disclaimer of Warranties
               </h2>
@@ -307,7 +352,7 @@ export default function TermsPage() {
             </section>
 
             {/* Section 9 */}
-            <section id="liability" className="scroll-mt-24 space-y-3">
+            <section id="liability" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">9.</span> Limitation of Liability
               </h2>
@@ -317,7 +362,7 @@ export default function TermsPage() {
             </section>
 
             {/* Section 10 */}
-            <section id="changes" className="scroll-mt-24 space-y-3">
+            <section id="changes" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">10.</span> Modifications to Terms
               </h2>
@@ -330,7 +375,7 @@ export default function TermsPage() {
             </section>
 
             {/* Section 11 */}
-            <section id="contact" className="scroll-mt-24 space-y-3">
+            <section id="contact" className="scroll-mt-28 space-y-3">
               <h2 className="font-mono text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-cyan-400">11.</span> Community Governance & Contact
               </h2>
@@ -356,7 +401,7 @@ export default function TermsPage() {
               </div>
             </section>
 
-          </div>
+          </main>
         </div>
 
       </div>

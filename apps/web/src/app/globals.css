@@ -18,13 +18,13 @@
     color-scheme: dark;
     background-color: #050505;
     color: #ffffff;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   body {
     background-color: #050505;
     color: #ffffff;
-    overflow-x: hidden;
+    overflow-x: clip;
     min-height: 100vh;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
