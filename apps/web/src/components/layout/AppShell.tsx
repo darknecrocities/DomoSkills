@@ -13,6 +13,7 @@ import { AuthModal } from '../auth/AuthModal';
 import { recordVisit } from '@/lib/firestoreMetrics';
 import { CartFlyAnimation } from '../cart/CartFlyAnimation';
 import { SkillComparatorDrawer } from '../comparison/SkillComparatorDrawer';
+import { DemoTourController } from '../demo/DemoTourController';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -51,6 +52,7 @@ export function AppShell({ children }: AppShellProps) {
           onClose={() => setCommandPaletteOpen(false)}
         />
         <SkillComparatorDrawer />
+        <DemoTourController />
       </div>
     </AuthProvider>
   );
