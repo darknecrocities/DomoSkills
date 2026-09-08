@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { X, Mail, Lock, User, Eye, EyeOff, Check, ArrowRight, ShieldCheck, Sparkles, Terminal, AlertCircle, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -389,13 +390,21 @@ export function AuthModal() {
             <div className="space-y-3 pt-2 text-center text-[11px] text-text-muted">
               <div>
                 By continuing you agree to our{' '}
-                <a href="#" className="underline text-text-secondary hover:text-white">
+                <Link
+                  href="/terms"
+                  onClick={closeAuthModal}
+                  className="underline text-text-secondary hover:text-white transition"
+                >
                   Terms of Service
-                </a>{' '}
+                </Link>{' '}
                 and{' '}
-                <a href="#" className="underline text-text-secondary hover:text-white">
+                <Link
+                  href="/privacy"
+                  onClick={closeAuthModal}
+                  className="underline text-text-secondary hover:text-white transition"
+                >
                   Privacy Policy
-                </a>
+                </Link>
                 .
               </div>
 

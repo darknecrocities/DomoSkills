@@ -163,10 +163,6 @@
   animation: beltMarquee 35s linear infinite;
 }
 
-.animate-belt-marquee:hover {
-  animation-play-state: paused;
-}
-
 /* Infinite Wavy Starter Packs Carousel */
 @keyframes wavyCarouselMarquee {
   0% {

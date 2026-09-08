@@ -18,6 +18,8 @@ import {
   Scale,
   Download,
   Star,
+  FileText,
+  Lock,
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { useCartStore } from '@/store/useCartStore';
@@ -114,7 +116,33 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         router.push('/doctor');
       },
     },
+    {
+      label: 'Terms of Service',
+      shortcut: 'T',
+      icon: FileText,
+      action: () => {
+        onClose();
+        router.push('/terms');
+      },
+    },
+    {
+      label: 'Privacy Policy',
+      shortcut: 'P',
+      icon: Lock,
+      action: () => {
+        onClose();
+        router.push('/privacy');
+      },
+    },
   ];
+
+  const filteredQuickActions = query.trim()
+    ? quickActions.filter(
+        (qa) =>
+          qa.label.toLowerCase().includes(query.toLowerCase()) ||
+          qa.shortcut.toLowerCase() === query.toLowerCase()
+      )
+    : quickActions;
 
   useEffect(() => {
     if (isOpen) {
@@ -179,12 +207,13 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         {/* Results List */}
         <div className="max-h-[65vh] overflow-y-auto p-3 sm:p-4 space-y-4">
           {/* Quick Actions / Layout Shortcuts */}
-          <div>
-            <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-text-muted">
-              Quick Actions & Layout Controls
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mt-1">
-              {quickActions.map((qa) => {
+          {filteredQuickActions.length > 0 && (
+            <div>
+              <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-text-muted">
+                Quick Actions & Navigation ({filteredQuickActions.length})
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mt-1">
+                {filteredQuickActions.map((qa) => {
                 const Icon = qa.icon;
                 return (
                   <button
@@ -205,6 +234,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
               })}
             </div>
           </div>
+        )}
 
           {/* Skills Section */}
           <div>

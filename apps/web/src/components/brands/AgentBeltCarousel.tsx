@@ -5,7 +5,6 @@ import React from 'react';
 interface AgentBrand {
   id: string;
   name: string;
-  category: string;
   fontClass: string;
   logo: React.ReactNode;
 }
@@ -14,7 +13,6 @@ const AGENT_BRANDS: AgentBrand[] = [
   {
     id: 'antigravity',
     name: 'Google Antigravity',
-    category: 'AI Coding Agent',
     fontClass: 'font-sans font-medium tracking-tight',
     logo: (
       <img
@@ -27,7 +25,6 @@ const AGENT_BRANDS: AgentBrand[] = [
   {
     id: 'claude-code',
     name: 'Claude Code',
-    category: 'Anthropic Terminal',
     fontClass: 'font-[family-name:var(--font-anthropic)] font-medium tracking-tight text-[15px]',
     logo: (
       <svg className="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none">
@@ -43,7 +40,6 @@ const AGENT_BRANDS: AgentBrand[] = [
   {
     id: 'cursor',
     name: 'Cursor',
-    category: 'AI Code Editor',
     fontClass: 'font-mono font-bold tracking-tight',
     logo: (
       <img
@@ -56,7 +52,6 @@ const AGENT_BRANDS: AgentBrand[] = [
   {
     id: 'openai',
     name: 'OpenAI',
-    category: 'Frontier AI',
     fontClass: 'font-[family-name:var(--font-openai)] font-bold tracking-wide',
     logo: (
       <svg className="h-6 w-6 shrink-0 text-white fill-white" viewBox="0 0 24 24">
@@ -67,7 +62,6 @@ const AGENT_BRANDS: AgentBrand[] = [
   {
     id: 'codex',
     name: 'OpenAI Codex',
-    category: 'Agent Synthesis',
     fontClass: 'font-mono font-bold tracking-tight',
     logo: (
       <img
@@ -80,7 +74,6 @@ const AGENT_BRANDS: AgentBrand[] = [
   {
     id: 'opencode',
     name: 'OpenCode',
-    category: 'Universal Open Agent',
     fontClass: 'font-mono font-black tracking-wider',
     logo: (
       <img
@@ -93,7 +86,6 @@ const AGENT_BRANDS: AgentBrand[] = [
   {
     id: 'windsurf',
     name: 'Windsurf',
-    category: 'Cascade Agent IDE',
     fontClass: 'font-sans font-bold tracking-wide',
     logo: (
       <svg className="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none">
@@ -108,7 +100,7 @@ export function AgentBeltCarousel() {
   const trackItems = [...AGENT_BRANDS, ...AGENT_BRANDS];
 
   return (
-    <div className="relative w-full overflow-hidden border-y border-border bg-surface/50 backdrop-blur-md py-6">
+    <div className="relative w-full overflow-hidden border-y border-border bg-surface/50 backdrop-blur-md py-5">
       
       {/* Left Blur & Fade-out Gradient Overlay */}
       <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-20 w-28 sm:w-48 bg-gradient-to-r from-background via-background/80 to-transparent backdrop-blur-[2px]" />
@@ -116,27 +108,22 @@ export function AgentBeltCarousel() {
       {/* Right Blur & Fade-out Gradient Overlay */}
       <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-20 w-28 sm:w-48 bg-gradient-to-l from-background via-background/80 to-transparent backdrop-blur-[2px]" />
 
-      {/* Marquee Belt Track with mathematically seamless continuous loop */}
+      {/* Marquee Belt Track with continuous loop (no hover stopping) */}
       <div className="flex w-max select-none">
         {/* Track 1 */}
-        <div className="animate-belt-marquee flex items-center gap-12 sm:gap-16 pr-12 sm:pr-16 shrink-0">
+        <div className="animate-belt-marquee flex items-center gap-10 sm:gap-14 pr-10 sm:pr-14 shrink-0">
           {trackItems.map((brand, idx) => (
             <div
               key={`t1-${brand.id}-${idx}`}
-              className="group flex items-center gap-3.5 cursor-pointer select-none shrink-0 transition-transform duration-200 hover:scale-105"
+              className="group flex items-center gap-3 select-none shrink-0 transition-transform duration-200 hover:scale-105"
             >
-              <div className="flex h-8 w-8 items-center justify-center transition-transform duration-200 group-hover:scale-110">
+              <div className="flex h-7 w-7 items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-110">
                 {brand.logo}
               </div>
               
-              <div className="flex flex-col">
-                <span className={`${brand.fontClass} text-white tracking-tight text-sm group-hover:text-emerald-400 transition-colors`}>
-                  {brand.name}
-                </span>
-                <span className="font-mono text-[10px] text-text-muted group-hover:text-text-secondary transition-colors">
-                  {brand.category}
-                </span>
-              </div>
+              <span className={`${brand.fontClass} text-white tracking-tight text-sm font-medium whitespace-nowrap group-hover:text-emerald-400 transition-colors`}>
+                {brand.name}
+              </span>
 
               <div className="h-1 w-1 rounded-full bg-border-bright/40 ml-4 group-hover:bg-emerald-400 transition-colors" />
             </div>
@@ -144,24 +131,19 @@ export function AgentBeltCarousel() {
         </div>
 
         {/* Track 2 (Cloned for mathematically seamless continuous infinite loop) */}
-        <div className="animate-belt-marquee flex items-center gap-12 sm:gap-16 pr-12 sm:pr-16 shrink-0" aria-hidden="true">
+        <div className="animate-belt-marquee flex items-center gap-10 sm:gap-14 pr-10 sm:pr-14 shrink-0" aria-hidden="true">
           {trackItems.map((brand, idx) => (
             <div
               key={`t2-${brand.id}-${idx}`}
-              className="group flex items-center gap-3.5 cursor-pointer select-none shrink-0 transition-transform duration-200 hover:scale-105"
+              className="group flex items-center gap-3 select-none shrink-0 transition-transform duration-200 hover:scale-105"
             >
-              <div className="flex h-8 w-8 items-center justify-center transition-transform duration-200 group-hover:scale-110">
+              <div className="flex h-7 w-7 items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-110">
                 {brand.logo}
               </div>
               
-              <div className="flex flex-col">
-                <span className={`${brand.fontClass} text-white tracking-tight text-sm group-hover:text-emerald-400 transition-colors`}>
-                  {brand.name}
-                </span>
-                <span className="font-mono text-[10px] text-text-muted group-hover:text-text-secondary transition-colors">
-                  {brand.category}
-                </span>
-              </div>
+              <span className={`${brand.fontClass} text-white tracking-tight text-sm font-medium whitespace-nowrap group-hover:text-emerald-400 transition-colors`}>
+                {brand.name}
+              </span>
 
               <div className="h-1 w-1 rounded-full bg-border-bright/40 ml-4 group-hover:bg-emerald-400 transition-colors" />
             </div>

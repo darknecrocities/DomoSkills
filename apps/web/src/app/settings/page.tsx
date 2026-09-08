@@ -548,6 +548,23 @@ export default function SettingsPage() {
               </div>
             </div>
 
+            {/* Legal & Policies */}
+            <div className="rounded-2xl border border-border bg-surface p-5 space-y-2 font-mono text-xs">
+              <div className="flex items-center gap-2 text-text-muted">
+                <ShieldCheck className="h-4 w-4 text-cyan-400" />
+                <span>Legal & Platform Policies</span>
+              </div>
+              <div className="flex items-center gap-3 pt-1 text-[11px]">
+                <Link href="/terms" className="text-cyan-400 hover:underline">
+                  Terms of Service →
+                </Link>
+                <span className="text-border-bright">•</span>
+                <Link href="/privacy" className="text-emerald-400 hover:underline">
+                  Privacy Policy →
+                </Link>
+              </div>
+            </div>
+
           </div>
 
         </div>
