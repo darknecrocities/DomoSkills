@@ -7,21 +7,17 @@ import {
   AgentTarget,
 } from '@domoskills/validators';
 import { getAdapter, generateInstallCommand, getSkillFullPath } from '@domoskills/adapters';
-import { SEED_CATEGORIES, SEED_SKILLS, SEED_REPOSITORIES } from './seed-data.js';
 import { SkillSearchEngine } from './search-engine.js';
 import { SkillFilterOptions, SkillSearchResult } from './types.js';
+import { RegistryDatabase } from './db/database.js';
 
 export class RegistryService {
-  private skills: Map<string, Skill> = new Map();
-  private categories: Category[] = [...SEED_CATEGORIES];
-  private submissions: Map<string, SubmissionRecord> = new Map();
+  private db: RegistryDatabase;
   private searchEngine: SkillSearchEngine;
 
-  constructor() {
-    for (const skill of SEED_SKILLS) {
-      this.skills.set(skill.slug, skill);
-    }
-    this.searchEngine = new SkillSearchEngine(Array.from(this.skills.values()));
+  constructor(dbInstance?: RegistryDatabase) {
+    this.db = dbInstance || new RegistryDatabase();
+    this.searchEngine = new SkillSearchEngine(this.db.getAllSkills());
   }
 
   getSkills(options: SkillFilterOptions = {}): SkillSearchResult {
@@ -29,46 +25,32 @@ export class RegistryService {
   }
 
   getSkillBySlug(slug: string): Skill | null {
-    return this.skills.get(slug) || null;
+    return this.db.getSkillBySlug(slug);
   }
 
   getAllSkills(): Skill[] {
-    return Array.from(this.skills.values());
+    return this.db.getAllSkills();
   }
 
   getCategories(): Category[] {
-    return this.categories;
+    return this.db.getAllCategories();
   }
 
   getFeaturedSkills(limit = 6): Skill[] {
-    return Array.from(this.skills.values())
-      .filter((s) => s.isFeatured)
-      .slice(0, limit);
+    return this.db.getFeaturedSkills(limit);
   }
 
   getTrendingSkills(limit = 8): Skill[] {
-    return Array.from(this.skills.values())
-      .sort((a, b) => b.installs - a.installs)
-      .slice(0, limit);
+    return this.db.getTrendingSkills(limit);
   }
 
   getStats() {
-    const all = Array.from(this.skills.values());
-    const totalInstalls = all.reduce((acc, s) => acc + s.installs, 0);
-    const verifiedCount = all.filter((s) => s.isVerified).length;
-    const uniqueRepos = new Set(all.map((s) => `${s.sourceRepository.owner}/${s.sourceRepository.repository}`)).size;
-
-    return {
-      totalSkills: all.length,
-      totalInstalls,
-      totalRepositories: uniqueRepos,
-      verifiedPercentage: Math.round((verifiedCount / all.length) * 100),
-    };
+    return this.db.getStats();
   }
 
   registerSkill(skill: Skill) {
-    this.skills.set(skill.slug, skill);
-    this.searchEngine = new SkillSearchEngine(Array.from(this.skills.values()));
+    this.db.insertSkill(skill);
+    this.searchEngine = new SkillSearchEngine(this.db.getAllSkills());
   }
 
   async submitSkill(request: SubmissionRequest): Promise<{ success: boolean; record: SubmissionRecord; message: string }> {
@@ -90,7 +72,7 @@ export class RegistryService {
     };
 
     // Auto-index skill into active registry so live skill counters update immediately
-    if (!this.skills.has(slug)) {
+    if (!this.db.getSkillBySlug(slug)) {
       const newSkill: Skill = {
         id: `skill-${slug}`,
         slug,
@@ -145,7 +127,7 @@ export class RegistryService {
       this.registerSkill(newSkill);
     }
 
-    this.submissions.set(id, record);
+    this.db.insertSubmission(record);
 
     return {
       success: true,

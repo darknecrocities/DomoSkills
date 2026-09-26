@@ -6,10 +6,11 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node -e \"const { runMigration } = require('./dist/db/migrate.js'); runMigration();\"",
     "dev": "tsc --watch",
     "type-check": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:migrate": "tsc && node -e \"const { runMigration } = require('./dist/db/migrate.js'); runMigration();\""
   },
   "dependencies": {
     "@domoskills/adapters": "workspace:*",

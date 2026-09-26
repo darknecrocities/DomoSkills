@@ -9,6 +9,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "type-check": "turbo run type-check",
+    "db:migrate": "pnpm --filter @domoskills/registry db:migrate",
     "cli": "node packages/cli/bin/domoskills.js"
   },
   "devDependencies": {
