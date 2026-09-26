@@ -48,7 +48,7 @@ export function DomoMascot({
     laptop: '/assets/domodomo/domolaptop.gif',
     reading: '/assets/domodomo/domoreading.gif',
     action: '/assets/domodomo/domotest.gif',
-    wink: '/assets/domodomo/domodomo_wink.png',
+    wink: '/official_domoskills_icon.png',
     cube: '/assets/domoskills-mascot.gif',
   };
 

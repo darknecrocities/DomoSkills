@@ -22,8 +22,8 @@ export function Footer() {
             <div className="flex items-center gap-2.5 mb-4">
               <div className="relative h-8 w-8 overflow-hidden rounded-lg border border-white/20 bg-surface-raised">
                 <img
-                  src="/assets/domodomo/domodomo-app-icon.png"
-                  alt="DomoDomo App Icon"
+                  src="/official_domoskills_icon.png"
+                  alt="DomoSkills"
                   className="h-full w-full object-cover"
                 />
               </div>
@@ -104,6 +104,17 @@ export function Footer() {
                 <Link href="/submit" className="text-text-secondary hover:text-white transition">
                   Submit Skill Repository
                 </Link>
+              </li>
+              <li>
+                <a
+                  href="https://domodomo.site/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-white hover:underline transition font-semibold"
+                >
+                  <span>DomoDomo (Web & Agent Tools)</span>
+                  <ExternalLink className="h-3 w-3 text-text-muted" />
+                </a>
               </li>
               <li>
                 <a

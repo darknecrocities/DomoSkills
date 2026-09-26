@@ -10,6 +10,7 @@ import {
   Flame,
   Star,
   Lock,
+  ExternalLink,
 } from 'lucide-react';
 import { registry } from '@domoskills/registry';
 import { AGENT_ADAPTERS, AGENT_TARGET_LIST } from '@domoskills/adapters';
@@ -122,6 +123,50 @@ export default function HomePage() {
       <ScrollReveal direction="none" duration={0.4}>
         <AgentBeltCarousel />
       </ScrollReveal>
+
+      {/* ========================================================================= */}
+      {/* 2.5 SISTER SUITE SPOTLIGHT (DOMODOMO) */}
+      {/* ========================================================================= */}
+      <section className="border-b border-border py-8 bg-surface/40">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <ScrollReveal direction="up" distance={16} duration={0.5}>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 rounded-2xl border border-white/20 bg-surface-raised p-5 sm:p-7 shadow-[0_0_30px_rgba(255,255,255,0.03)] hover:border-white transition">
+              <div className="flex items-center gap-4">
+                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-white/20 bg-surface p-1">
+                  <img
+                    src="/assets/domodomo/domodomo-app-icon.png"
+                    alt="DomoDomo"
+                    className="h-full w-full object-cover rounded-lg"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-mono text-sm sm:text-base font-bold text-white">
+                      Looking for Web & Agent Tools? Meet DomoDomo
+                    </h3>
+                    <span className="hidden sm:inline-block rounded border border-white/20 bg-white text-black px-2 py-0.5 text-[10px] font-bold font-mono uppercase">
+                      Companion Suite
+                    </span>
+                  </div>
+                  <p className="font-sans text-xs sm:text-sm text-text-secondary mt-1 max-w-2xl leading-relaxed">
+                    Fast browser utilities, format converters, and developer tools ready to use directly at domodomo.site with zero setup.
+                  </p>
+                </div>
+              </div>
+
+              <a
+                href="https://domodomo.site/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 flex items-center gap-2 rounded-xl border border-white bg-white px-4 sm:px-5 py-2.5 font-mono text-xs font-bold text-black uppercase tracking-wider hover:bg-muted-white transition shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+              >
+                <span>Visit domodomo.site</span>
+                <ExternalLink className="h-3.5 w-3.5 text-black" />
+              </a>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
 
       {/* ========================================================================= */}
       {/* 3. EXPLORE BY DOMAIN */}

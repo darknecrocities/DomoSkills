@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { AnnouncementBanner } from './AnnouncementBanner';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { CursorSpotlight } from '../effects/CursorSpotlight';
@@ -32,6 +33,9 @@ export function AppShell({ children }: AppShellProps) {
       <div className="relative min-h-screen flex flex-col justify-between">
         {/* Background Spotlight */}
         <CursorSpotlight />
+
+        {/* Global Announcement Banner */}
+        <AnnouncementBanner />
 
         {/* Top Navigation */}
         <Navbar onOpenCommandPalette={() => setCommandPaletteOpen(true)} />

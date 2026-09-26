@@ -79,8 +79,8 @@ export function AnimatedPillBadge({ phrases = DEFAULT_PHRASES, className = '' }:
   return (
     <div className={`inline-flex items-center gap-2.5 rounded-full border border-border bg-surface px-4 py-1.5 font-mono text-xs text-text-secondary shadow-sm ${className}`}>
       <img
-        src="/assets/domodomo/domodomo-app-icon.png"
-        alt="Domo Mascot"
+        src="/official_domoskills_icon.png"
+        alt="DomoSkills"
         className="h-4 w-4 rounded-full object-cover shrink-0"
       />
       <div className="relative h-4 overflow-hidden min-w-[210px] flex items-center">

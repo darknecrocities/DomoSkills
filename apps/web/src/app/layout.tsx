@@ -28,6 +28,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://domoskills.com'),
   title: 'DomoSkills — The Open Agent Skills Marketplace',
   description:
     'Discover, stack, and install open-source capabilities for AI coding agents. Free, secure, developer-native registry for Universal, Claude Code, Cursor, OpenCode, Codex, Copilot, and Gemini.',
@@ -47,16 +48,17 @@ export const metadata: Metadata = {
     title: 'DomoSkills — The Open Agent Skills Marketplace',
     description: 'Discover and install modular open-source skills for AI coding agents in one command.',
     type: 'website',
-    images: ['/assets/domodomo/domodomo-app-icon.png'],
+    images: ['/official_domoskills_icon.png'],
   },
   icons: {
     icon: [
-      { url: '/assets/domodomo/domodomo-app-icon.png', sizes: '32x32', type: 'image/png' },
-      { url: '/assets/domodomo/domodomo-app-icon.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icon.png', sizes: 'any' },
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/official_domoskills_icon.png', sizes: 'any', type: 'image/png' },
     ],
-    shortcut: '/assets/domodomo/domodomo-app-icon.png',
-    apple: '/assets/domodomo/domodomo-app-icon.png',
+    shortcut: '/official_domoskills_icon.png',
+    apple: '/apple-icon.png',
   },
 };
 
