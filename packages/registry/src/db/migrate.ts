@@ -1,10 +1,5 @@
-import path from 'node:path';
-import fs from 'node:fs';
 import { RegistryDatabase, getDbPath } from './database.js';
-import categoriesData from '../data/categories.json';
-import repositoriesData from '../data/repositories.json';
-import skillsData from '../data/skills.json';
-import { Category, Skill, SourceRepository } from '@domoskills/validators';
+import { SEED_CATEGORIES, SEED_REPOSITORIES, SEED_SKILLS } from '../seed-data.js';
 
 export function runMigration(customDbPath?: string): {
   categoriesCount: number;
@@ -16,20 +11,17 @@ export function runMigration(customDbPath?: string): {
   const db = new RegistryDatabase(dbPath);
 
   // 1. Migrate categories
-  const categories = categoriesData as unknown as Category[];
-  for (const cat of categories) {
+  for (const cat of SEED_CATEGORIES) {
     db.insertCategory(cat);
   }
 
   // 2. Migrate repositories
-  const repositoriesMap = repositoriesData as unknown as Record<string, SourceRepository>;
-  for (const repoId of Object.keys(repositoriesMap)) {
-    db.insertRepository(repositoriesMap[repoId]);
+  for (const repoId of Object.keys(SEED_REPOSITORIES)) {
+    db.insertRepository(SEED_REPOSITORIES[repoId]);
   }
 
   // 3. Migrate skills
-  const skills = skillsData as unknown as Skill[];
-  for (const skill of skills) {
+  for (const skill of SEED_SKILLS) {
     db.insertSkill(skill);
   }
 
@@ -38,8 +30,8 @@ export function runMigration(customDbPath?: string): {
   db.close();
 
   return {
-    categoriesCount: categories.length,
-    repositoriesCount: Object.keys(repositoriesMap).length,
+    categoriesCount: SEED_CATEGORIES.length,
+    repositoriesCount: Object.keys(SEED_REPOSITORIES).length,
     skillsCount: stats.totalSkills,
     dbPath,
   };

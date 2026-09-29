@@ -175,7 +175,7 @@ export function HeroSearch() {
               setSelectedIndex(-1);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Search 135+ agent skills..."
+            placeholder="Search 1,000+ agent skills..."
             className="w-full bg-transparent px-2 sm:px-3 py-2 font-mono text-xs sm:text-sm text-white placeholder:text-text-muted focus:outline-none min-w-0"
           />
 

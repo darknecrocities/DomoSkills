@@ -72,7 +72,7 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${lora.variable} ${plusJakarta.variable} dark`}
     >
-      <body className="bg-background text-white antialiased selection:bg-white selection:text-black min-h-screen flex flex-col justify-between">
+      <body className="bg-background text-white antialiased selection:bg-white selection:text-black min-h-screen">
         <AppShell>{children}</AppShell>
       </body>
     </html>

@@ -70,7 +70,7 @@ export function ScrollReveal({
     <motion.div
       initial={initial}
       whileInView={animate}
-      viewport={{ once: true, margin: '-50px' }}
+      viewport={{ once: true, amount: 0.05 }}
       className={className}
     >
       {children}

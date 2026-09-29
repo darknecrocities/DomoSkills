@@ -10,6 +10,11 @@ import {
   CREATE_SKILLS_TABLE,
   CREATE_SUBMISSIONS_TABLE,
 } from './schema.js';
+import {
+  SEED_CATEGORIES,
+  SEED_REPOSITORIES,
+  SEED_SKILLS,
+} from '../seed-data.js';
 
 function dynamicRequire(moduleName: string): any {
   if (typeof window !== 'undefined') {
@@ -31,38 +36,71 @@ export function getDbPath(): string {
   const fs = dynamicRequire('node:fs');
   if (!path || !fs) return '';
 
-  const defaultDir = path.resolve(__dirname, '../../data');
-  if (!fs.existsSync(defaultDir)) {
-    fs.mkdirSync(defaultDir, { recursive: true });
+  const candidates = [
+    path.resolve(process.cwd(), 'packages/registry/data/domoskills.db'),
+    path.resolve(process.cwd(), 'data/domoskills.db'),
+    path.resolve(__dirname, '../../data/domoskills.db'),
+    path.resolve(__dirname, '../data/domoskills.db'),
+    path.resolve(__dirname, '../../../packages/registry/data/domoskills.db'),
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      if (fs.existsSync(candidate)) {
+        return candidate;
+      }
+    } catch {}
   }
+
+  const defaultDir = path.resolve(__dirname, '../../data');
+  try {
+    if (!fs.existsSync(defaultDir)) {
+      fs.mkdirSync(defaultDir, { recursive: true });
+    }
+  } catch {}
   return path.join(defaultDir, 'domoskills.db');
 }
 
 export class RegistryDatabase {
   private db: any = null;
   private memorySkills: Map<string, Skill> = new Map();
-  private memoryCategories: Category[] = [];
+  private memoryCategories: Category[] = [...SEED_CATEGORIES];
+  private memoryRepositories: Map<string, SourceRepository> = new Map();
+  private memorySubmissions: Map<string, SubmissionRecord> = new Map();
 
   constructor(dbPath?: string) {
-    const DatabaseSync = dynamicRequire('node:sqlite')?.DatabaseSync;
+    // 1. Always initialize in-memory catalog from seed data as instant baseline
+    for (const skill of SEED_SKILLS) {
+      this.memorySkills.set(skill.slug, skill);
+    }
+    for (const repoId of Object.keys(SEED_REPOSITORIES)) {
+      this.memoryRepositories.set(repoId, SEED_REPOSITORIES[repoId]);
+    }
+
+    // 2. Attempt SQLite connection if environment supports native sqlite
+    const sqliteModuleName = 'node' + ':sqlite';
+    const DatabaseSync = dynamicRequire(sqliteModuleName)?.DatabaseSync;
     const path = dynamicRequire('node:path');
     const fs = dynamicRequire('node:fs');
 
     if (DatabaseSync && path && fs) {
-      const targetPath = dbPath || getDbPath();
-      const dir = path.dirname(targetPath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
       try {
-        this.db = new DatabaseSync(targetPath);
-        // Enable WAL mode & busy timeout to prevent concurrent lock contention
-        this.db.exec('PRAGMA journal_mode = WAL;');
-        this.db.exec('PRAGMA busy_timeout = 5000;');
-        this.db.exec('PRAGMA synchronous = NORMAL;');
-        this.initSchema();
+        const targetPath = dbPath || getDbPath();
+        if (targetPath) {
+          const dir = path.dirname(targetPath);
+          if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+          }
+          this.db = new DatabaseSync(targetPath);
+          this.db.exec('PRAGMA journal_mode = WAL;');
+          this.db.exec('PRAGMA busy_timeout = 5000;');
+          this.db.exec('PRAGMA synchronous = NORMAL;');
+          this.initSchema();
+          this.autoSeedIfEmpty();
+        }
       } catch (err) {
-        // Fallback gracefully if database is locked during build
+        // Fallback safely to in-memory store
+        this.db = null;
       }
     }
   }
@@ -79,12 +117,32 @@ export class RegistryDatabase {
     }
   }
 
+  private autoSeedIfEmpty() {
+    if (!this.db) return;
+    try {
+      const countRow = this.db.prepare('SELECT COUNT(*) as count FROM skills').get() as any;
+      const count = Number(countRow?.count || 0);
+      if (count < SEED_SKILLS.length) {
+        for (const cat of SEED_CATEGORIES) {
+          this.insertCategory(cat);
+        }
+        for (const repoId of Object.keys(SEED_REPOSITORIES)) {
+          this.insertRepository(SEED_REPOSITORIES[repoId]);
+        }
+        for (const skill of SEED_SKILLS) {
+          this.insertSkill(skill);
+        }
+      }
+    } catch {}
+  }
+
   // Categories
   getAllCategories(): Category[] {
     if (!this.db) return this.memoryCategories;
     try {
       const stmt = this.db.prepare('SELECT * FROM categories ORDER BY "order" ASC, name ASC');
       const rows = stmt.all() as any[];
+      if (!rows || rows.length === 0) return this.memoryCategories;
       return rows.map((r) => ({
         id: r.id,
         slug: r.slug,
@@ -99,10 +157,14 @@ export class RegistryDatabase {
   }
 
   insertCategory(category: Category) {
-    if (!this.db) {
+    const existingIdx = this.memoryCategories.findIndex((c) => c.slug === category.slug);
+    if (existingIdx >= 0) {
+      this.memoryCategories[existingIdx] = category;
+    } else {
       this.memoryCategories.push(category);
-      return;
     }
+
+    if (!this.db) return;
     try {
       const stmt = this.db.prepare(
         'INSERT OR REPLACE INTO categories (id, slug, name, description, icon, "order") VALUES (?, ?, ?, ?, ?, ?)'
@@ -113,10 +175,11 @@ export class RegistryDatabase {
 
   // Repositories
   getAllRepositories(): SourceRepository[] {
-    if (!this.db) return [];
+    if (!this.db) return Array.from(this.memoryRepositories.values());
     try {
       const stmt = this.db.prepare('SELECT * FROM repositories');
       const rows = stmt.all() as any[];
+      if (!rows || rows.length === 0) return Array.from(this.memoryRepositories.values());
       return rows.map((r) => ({
         id: r.id,
         owner: r.owner,
@@ -131,11 +194,12 @@ export class RegistryDatabase {
         createdAt: r.createdAt,
       }));
     } catch {
-      return [];
+      return Array.from(this.memoryRepositories.values());
     }
   }
 
   insertRepository(repo: SourceRepository) {
+    this.memoryRepositories.set(repo.id, repo);
     if (!this.db) return;
     try {
       const stmt = this.db.prepare(
@@ -164,6 +228,7 @@ export class RegistryDatabase {
     try {
       const stmt = this.db.prepare('SELECT * FROM skills');
       const rows = stmt.all() as any[];
+      if (!rows || rows.length === 0) return Array.from(this.memorySkills.values());
       return rows.map(this.mapRowToSkill);
     } catch {
       return Array.from(this.memorySkills.values());
@@ -175,7 +240,7 @@ export class RegistryDatabase {
     try {
       const stmt = this.db.prepare('SELECT * FROM skills WHERE slug = ?');
       const row = stmt.get(slug) as any;
-      return row ? this.mapRowToSkill(row) : null;
+      return row ? this.mapRowToSkill(row) : (this.memorySkills.get(slug) || null);
     } catch {
       return this.memorySkills.get(slug) || null;
     }
@@ -190,6 +255,11 @@ export class RegistryDatabase {
     try {
       const stmt = this.db.prepare('SELECT * FROM skills WHERE isFeatured = 1 LIMIT ?');
       const rows = stmt.all(limit) as any[];
+      if (!rows || rows.length === 0) {
+        return Array.from(this.memorySkills.values())
+          .filter((s) => s.isFeatured)
+          .slice(0, limit);
+      }
       return rows.map(this.mapRowToSkill);
     } catch {
       return Array.from(this.memorySkills.values())
@@ -207,6 +277,11 @@ export class RegistryDatabase {
     try {
       const stmt = this.db.prepare('SELECT * FROM skills ORDER BY installs DESC LIMIT ?');
       const rows = stmt.all(limit) as any[];
+      if (!rows || rows.length === 0) {
+        return Array.from(this.memorySkills.values())
+          .sort((a, b) => b.installs - a.installs)
+          .slice(0, limit);
+      }
       return rows.map(this.mapRowToSkill);
     } catch {
       return Array.from(this.memorySkills.values())
@@ -216,10 +291,8 @@ export class RegistryDatabase {
   }
 
   insertSkill(skill: Skill) {
-    if (!this.db) {
-      this.memorySkills.set(skill.slug, skill);
-      return;
-    }
+    this.memorySkills.set(skill.slug, skill);
+    if (!this.db) return;
     try {
       const stmt = this.db.prepare(
         `INSERT OR REPLACE INTO skills (
@@ -264,16 +337,16 @@ export class RegistryDatabase {
   }
 
   getStats() {
+    const memoryAll = Array.from(this.memorySkills.values());
+    const fallbackStats = {
+      totalSkills: memoryAll.length,
+      totalInstalls: memoryAll.reduce((acc, s) => acc + s.installs, 0),
+      totalRepositories: new Set(memoryAll.map((s) => `${s.sourceRepository?.owner}/${s.sourceRepository?.repository}`)).size,
+      verifiedPercentage: memoryAll.length > 0 ? Math.round((memoryAll.filter((s) => s.isVerified).length / memoryAll.length) * 100) : 100,
+    };
+
     if (!this.db) {
-      const all = Array.from(this.memorySkills.values());
-      const totalInstalls = all.reduce((acc, s) => acc + s.installs, 0);
-      const verifiedCount = all.filter((s) => s.isVerified).length;
-      return {
-        totalSkills: all.length,
-        totalInstalls,
-        totalRepositories: 0,
-        verifiedPercentage: all.length > 0 ? Math.round((verifiedCount / all.length) * 100) : 0,
-      };
+      return fallbackStats;
     }
 
     try {
@@ -283,6 +356,8 @@ export class RegistryDatabase {
       const reposRow = (this.db.prepare('SELECT COUNT(DISTINCT sourceRepositoryId) as count FROM skills').get() as any) || { count: 0 };
 
       const totalSkills = Number(totalSkillsRow.count) || 0;
+      if (totalSkills === 0) return fallbackStats;
+
       const totalInstalls = Number(installsRow.sum) || 0;
       const verifiedCount = Number(verifiedRow.count) || 0;
       const totalRepositories = Number(reposRow.count) || 0;
@@ -294,17 +369,13 @@ export class RegistryDatabase {
         verifiedPercentage: totalSkills > 0 ? Math.round((verifiedCount / totalSkills) * 100) : 0,
       };
     } catch {
-      return {
-        totalSkills: 0,
-        totalInstalls: 0,
-        totalRepositories: 0,
-        verifiedPercentage: 0,
-      };
+      return fallbackStats;
     }
   }
 
   // Submissions
   insertSubmission(record: SubmissionRecord) {
+    this.memorySubmissions.set(record.id, record);
     if (!this.db) return;
     try {
       const stmt = this.db.prepare(
@@ -362,6 +433,7 @@ export class RegistryDatabase {
       try {
         this.db.close();
       } catch {}
+      this.db = null;
     }
   }
 }
