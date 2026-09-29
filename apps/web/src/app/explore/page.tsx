@@ -328,7 +328,7 @@ function ExploreContent() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
           
           {/* Desktop Filter Sidebar */}
-          <div className="hidden lg:block space-y-6 rounded-lg border border-border bg-surface p-5 font-mono text-xs">
+          <div className="hidden lg:block sticky top-20 z-20 space-y-6 rounded-lg border border-border bg-surface p-5 font-mono text-xs max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-thin shadow-sm">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div className="flex items-center gap-2 font-bold uppercase tracking-wider text-white">
                 <SlidersHorizontal className="h-3.5 w-3.5" />
