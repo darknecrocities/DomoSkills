@@ -60,14 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const unsubscribe = onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
       if (fbUser) {
-        // Prevent any legacy static dummy email
-        if (fbUser.email === 'developer@google.com' || fbUser.email === 'developer@gmail.com') {
-          await signOut(auth);
-          setUser(null);
-          setLoading(false);
-          return;
-        }
-
         let customData: Partial<AppUser> = {};
         try {
           const cached = localStorage.getItem(`domoskills_profile_${fbUser.uid}`);
@@ -111,12 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const directUser = localStorage.getItem('domoskills_direct_auth_user');
           if (directUser) {
             const parsed = JSON.parse(directUser);
-            if (
-              parsed &&
-              parsed.email &&
-              !parsed.email.includes('developer@gmail.com') &&
-              !parsed.email.includes('developer@google.com')
-            ) {
+            if (parsed && parsed.email && typeof parsed.email === 'string' && parsed.email.includes('@')) {
               setUser(parsed);
               setLoading(false);
               return;
