@@ -13,8 +13,11 @@ export async function GET(request: NextRequest) {
   const hasScriptsParam = searchParams.get('hasScripts');
   const hasScripts = hasScriptsParam !== null ? hasScriptsParam === 'true' : undefined;
   const sortBy = (searchParams.get('sortBy') as any) || 'trending';
-  const limit = parseInt(searchParams.get('limit') || '50', 10);
-  const offset = parseInt(searchParams.get('offset') || '0', 10);
+  const rawLimit = parseInt(searchParams.get('limit') || '50', 10);
+  // Anti-scraping clamp: Prevents callers from downloading the entire database in a single query
+  const limit = Math.min(Math.max(1, isNaN(rawLimit) ? 50 : rawLimit), 60);
+  const rawOffset = parseInt(searchParams.get('offset') || '0', 10);
+  const offset = Math.max(0, isNaN(rawOffset) ? 0 : rawOffset);
 
   const results = registry.getSkills({
     query,
@@ -28,11 +31,19 @@ export async function GET(request: NextRequest) {
     offset,
   });
 
-  return NextResponse.json({
-    success: true,
-    data: results.skills,
-    total: results.total,
-    hasMore: results.hasMore,
-    categories: results.categories,
-  });
+  return NextResponse.json(
+    {
+      success: true,
+      data: results.skills,
+      total: results.total,
+      hasMore: results.hasMore,
+      categories: results.categories,
+    },
+    {
+      headers: {
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    }
+  );
 }
