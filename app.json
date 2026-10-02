@@ -1,0 +1,10 @@
+{
+  "name": "DomoSkills",
+  "slug": "domoskills",
+  "category": "developer-tools",
+  "tagline": "The Open Agent Skills Marketplace & CLI package manager for AI coding assistants.",
+  "description": "DomoSkills is the developer-native open-source capability registry and CLI package manager designed specifically for autonomous AI coding agents. Discover, search, and install modular skills into Google Antigravity, Claude Code, Cursor, Codex, and OpenCode with a single command.",
+  "homepage_url": "https://web-beta-six-81.vercel.app",
+  "support_url": "mailto:parejasarronkian@gmail.com",
+  "privacy_url": "https://web-beta-six-81.vercel.app/privacy"
+}
