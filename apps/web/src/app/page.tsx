@@ -26,6 +26,7 @@ import { AgentBeltCarousel } from '@/components/brands/AgentBeltCarousel';
 import { HeroSearch } from '@/components/home/HeroSearch';
 import { ScrollReveal } from '@/components/motion/ScrollReveal';
 import { AnimatedHeroHeadline, AnimatedPillBadge } from '@/components/motion/AnimatedHeroHeadline';
+import { VideoDemoSection } from '@/components/demo/VideoDemoSection';
 import { useLiveTelemetry } from '@/lib/firestoreMetrics';
 import { useGitHubStars } from '@/lib/useGitHubStars';
 
@@ -123,6 +124,11 @@ export default function HomePage() {
       <ScrollReveal direction="none" duration={0.4}>
         <AgentBeltCarousel />
       </ScrollReveal>
+
+      {/* ========================================================================= */}
+      {/* 2.2 VIDEO DEMO SHOWCASE (Mac Terminal Frame) */}
+      {/* ========================================================================= */}
+      <VideoDemoSection />
 
       {/* ========================================================================= */}
       {/* 2.5 SISTER SUITE SPOTLIGHT (DOMODOMO) */}
@@ -421,7 +427,7 @@ export default function HomePage() {
                   className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface-raised px-3.5 py-2.5 font-mono text-xs text-text-secondary hover:text-white hover:border-white transition"
                 >
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400 shrink-0" />
-                  <span>{formattedStars} Stars on GitHub</span>
+                  <span suppressHydrationWarning>{formattedStars} Stars on GitHub</span>
                 </a>
               </div>
 
@@ -431,9 +437,9 @@ export default function HomePage() {
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                   <span className="font-semibold">Public Community Index</span>
                 </div>
-                <div>• {formattedUsers} Developers</div>
-                <div>• {formattedInstalls} Installs</div>
-                <div>• {formattedVisits} Visits</div>
+                <div suppressHydrationWarning>• {formattedUsers} Developers</div>
+                <div suppressHydrationWarning>• {formattedInstalls} Installs</div>
+                <div suppressHydrationWarning>• {formattedVisits} Visits</div>
               </div>
             </div>
 

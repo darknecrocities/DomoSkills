@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Sparkles, ArrowRight, Check, Play, Pause, Layers } from 'lucide-react';
 import { BUNDLE_PRESETS, BundlePreset } from '@/data/bundlePresets';
@@ -11,9 +11,14 @@ import { fireCartFlyAnimation } from '@/components/cart/CartFlyAnimation';
 import { ScrollReveal } from '@/components/motion/ScrollReveal';
 
 export function CuratedBundlesSection() {
+  const [mounted, setMounted] = useState(false);
   const { addSkill, hasSkill } = useCartStore();
   const { user, openAuthModal } = useAuth();
   const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleInstallBundle = (bundle: BundlePreset, e: React.MouseEvent) => {
     if (!user) {
@@ -39,7 +44,7 @@ export function CuratedBundlesSection() {
   };
 
   const renderCard = (bundle: BundlePreset, index: number, trackId: string) => {
-    const isAllStacked = bundle.skillSlugs.every((slug) => hasSkill(slug));
+    const isAllStacked = mounted ? bundle.skillSlugs.every((slug) => hasSkill(slug)) : false;
     const delaySec = (index * -0.72).toFixed(2);
 
     return (
