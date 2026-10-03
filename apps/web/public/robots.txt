@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+Crawl-delay: 1
+
+# Explicit Allow for Search Crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# Host & Sitemaps
+Host: https://domoskills.com
+Sitemap: https://domoskills.com/sitemap.xml
+Sitemap: https://domoskills.com/sitemap-index.xml
+Sitemap: https://domoskills.com/sitemap-pages.xml
+Sitemap: https://domoskills.com/sitemap-skills.xml
+Sitemap: https://domoskills.com/sitemap-categories.xml
+Sitemap: https://domoskills.com/sitemap-agents.xml
+Sitemap: https://domoskills.com/sitemap-bundles.xml

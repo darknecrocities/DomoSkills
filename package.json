@@ -5,7 +5,8 @@
   "description": "DomoSkills — The Open Agent Skills Marketplace & Registry",
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build",
+    "build": "node scripts/generate-sitemaps.js && turbo run build",
+    "sitemap": "node scripts/generate-sitemaps.js",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "type-check": "turbo run type-check",
