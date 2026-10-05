@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DomoSkills — The Open Agent Skills Marketplace</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --card-bg: #141418;
+      --card-border: #27272a;
+      --accent: #f43f5e;
+      --accent-hover: #e11d48;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --border-subtle: #27272a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: rgba(9, 9, 11, 0.95);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+    .brand h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: block;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: #18181b;
+      color: var(--text-main);
+      border-color: #3f3f46;
+    }
+    .search-bar {
+      padding: 1rem 1.5rem 0.5rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 240px;
+      background: #18181b;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+    .filters {
+      display: flex;
+      gap: 0.4rem;
+      padding: 0 1.5rem 1rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      background: #18181b;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .filter-pill.active, .filter-pill:hover {
+      background: var(--text-main);
+      color: #000;
+      border-color: var(--text-main);
+    }
+    main {
+      flex: 1;
+      padding: 0 1.5rem 2rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .card:hover {
+      border-color: #3f3f46;
+      transform: translateY(-2px);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: monospace;
+      color: #fff;
+    }
+    .badge {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      font-weight: 600;
+    }
+    .card-meta {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .card-desc {
+      font-size: 0.8rem;
+      color: #d4d4d8;
+      line-height: 1.45;
+    }
+    .card-footer {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .cmd-box {
+      flex: 1;
+      background: #09090b;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 0.4rem 0.6rem;
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: #e4e4e7;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .copy-btn, .qs-copy-btn {
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      color: #fff;
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .copy-btn:hover, .qs-copy-btn:hover {
+      background: #3f3f46;
+    }
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #18181b;
+      color: #fff;
+      border: 1px solid #3f3f46;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.2s;
+      pointer-events: none;
+      z-index: 50;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="assets/domoskills-app-icon.png" alt="DomoSkills" />
+      <div>
+        <h1>DomoSkills</h1>
+        <span>Open Agent Skills Marketplace</span>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <button type="button" class="tab-btn active" id="tab-browse">Browse Skills</button>
+      <button type="button" class="tab-btn" id="tab-quickstart">CLI Quickstart</button>
+      <button type="button" class="tab-btn" id="tab-web">Web Platform ↗</button>
+    </div>
+  </header>
+
+  <div id="browse-view">
+    <div class="search-bar">
+      <input type="text" id="search-box" class="search-input" placeholder="Search 200+ agent skills (e.g. react, security, docker, owasp, postgres)..." />
+    </div>
+
+    <div class="filters" id="category-filters">
+      <button type="button" class="filter-pill active" data-category="all">All Categories</button>
+      <button type="button" class="filter-pill" data-category="Frontend">Frontend</button>
+      <button type="button" class="filter-pill" data-category="Security">Security</button>
+      <button type="button" class="filter-pill" data-category="AI/ML">AI / ML</button>
+      <button type="button" class="filter-pill" data-category="Backend">Backend</button>
+      <button type="button" class="filter-pill" data-category="DevOps">DevOps</button>
+      <button type="button" class="filter-pill" data-category="Architecture">Architecture</button>
+    </div>
+
+    <main>
+      <div class="grid" id="skills-grid"></div>
+    </main>
+  </div>
+
+  <div id="quickstart-view" style="display: none; padding: 2rem 1.5rem; max-width: 800px; margin: 0 auto; line-height: 1.6;">
+    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: #fff;">CLI Package Manager Quickstart</h2>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Install skills directly into any project with zero configuration. Supports Google Antigravity, Claude Code, Cursor, Codex, and OpenCode.</p>
+    
+    <div style="background: #141418; border: 1px solid var(--card-border); border-radius: 8px; padding: 1.2rem; margin-bottom: 1.2rem;">
+      <div style="font-size: 0.75rem; color: #a1a1aa; margin-bottom: 0.5rem; font-weight: 600;">1. Initialize DomoSkills in your repo</div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <code style="flex: 1; color: #4ade80; font-family: monospace; font-size: 0.85rem; background: #09090b; padding: 0.5rem 0.75rem; border-radius: 6px;">npx domoskills init</code>
+        <button type="button" class="qs-copy-btn" data-copy-cmd="npx domoskills init">Copy</button>
+      </div>
+    </div>
+
+    <div style="background: #141418; border: 1px solid var(--card-border); border-radius: 8px; padding: 1.2rem; margin-bottom: 1.2rem;">
+      <div style="font-size: 0.75rem; color: #a1a1aa; margin-bottom: 0.5rem; font-weight: 600;">2. Add verified skills for your AI coding agent</div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <code style="flex: 1; color: #4ade80; font-family: monospace; font-size: 0.85rem; background: #09090b; padding: 0.5rem 0.75rem; border-radius: 6px;">npx domoskills add react-performance owasp-agent-guardian</code>
+        <button type="button" class="qs-copy-btn" data-copy-cmd="npx domoskills add react-performance owasp-agent-guardian">Copy</button>
+      </div>
+    </div>
+
+    <div style="background: #141418; border: 1px solid var(--card-border); border-radius: 8px; padding: 1.2rem; margin-bottom: 1.2rem;">
+      <div style="font-size: 0.75rem; color: #a1a1aa; margin-bottom: 0.5rem; font-weight: 600;">3. Audit installed skills for security & compliance</div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <code style="flex: 1; color: #4ade80; font-family: monospace; font-size: 0.85rem; background: #09090b; padding: 0.5rem 0.75rem; border-radius: 6px;">npx domoskills audit</code>
+        <button type="button" class="qs-copy-btn" data-copy-cmd="npx domoskills audit">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="web-view" style="display: none; padding: 2rem 1.5rem; max-width: 800px; margin: 0 auto; text-align: center;">
+    <div style="background: #141418; border: 1px solid var(--card-border); border-radius: 12px; padding: 2.5rem 1.5rem;">
+      <h2 style="font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">DomoSkills Web Marketplace</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem; max-width: 520px; margin-left: auto; margin-right: auto;">Explore community skills, submit your own packages, and test real-time agent skill execution in the full online platform.</p>
+      <a href="https://web-beta-six-81.vercel.app/explore" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: var(--accent); color: #fff; text-decoration: none; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">Open Web Platform ↗</a>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Copied command to clipboard!</div>
+
+  <!-- Pure external CSP-compliant script -->
+  <script src="./app.js"></script>
+</body>
+</html>

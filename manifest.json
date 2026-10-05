@@ -40,7 +40,8 @@
       "llm": ["complete", "stream"]
     },
     "csp_overrides": {
-      "frame-src": ["https://web-beta-six-81.vercel.app"]
+      "frame-src": ["https://web-beta-six-81.vercel.app"],
+      "connect-src": ["https://web-beta-six-81.vercel.app", "https://api.github.com"]
     }
   }
 }
